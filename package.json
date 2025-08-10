@@ -1,0 +1,21 @@
+{
+  "name": "discord-anime-bot",
+  "version": "1.0.0",
+  "description": "Discord anime bot",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun --env-file=.env src/index.ts"
+  },
+  "author": "jtclarkjr",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.1.0",
+    "openai": "^5.12.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.19"
+  }
+}
