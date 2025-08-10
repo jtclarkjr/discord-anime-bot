@@ -76,7 +76,7 @@ export type ReleasingAnimeResponse = {
 
 // Utility types
 // OpenAI types
-export interface AnimeMatch {
+export type AnimeMatch = {
   anime: AnimeMedia
   reason: string
   confidence: number

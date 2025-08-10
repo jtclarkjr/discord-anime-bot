@@ -1,4 +1,4 @@
-export interface AnimeRecommendation {
+export type AnimeRecommendation = {
   title: string
   reason: string
   confidence: number

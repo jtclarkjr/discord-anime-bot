@@ -1,15 +1,10 @@
 import { OpenAI } from 'openai'
 import { OPENAI_API_KEY } from '../config/constants'
+import type { AnimeRecommendation } from '@/types/openai'
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY
 })
-
-export interface AnimeRecommendation {
-  title: string
-  reason: string
-  confidence: number
-}
 
 /**
  * Find anime recommendations based on a description using ChatGPT-5
