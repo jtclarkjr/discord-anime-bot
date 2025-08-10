@@ -12,4 +12,6 @@ services:
     environment:
       - ENV=production
       - COMPOSE_BAKE=true
+    volumes:
+      - ../data:/app/data # Mount data directory for persistent notifications  
     command: ["/usr/local/bin/run-app"]

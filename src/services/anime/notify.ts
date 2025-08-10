@@ -55,11 +55,13 @@ class NotificationService {
     }
   }
 
-  /**
-   * Save notifications to storage
+    /**
+   * Save notifications to persistent storage
    */
   private async saveNotifications() {
     try {
+      // console.log(`💾 [Save] Starting save process. In-memory notifications count: ${this.notifications.size}`)
+      
       // Convert to persistable format (without timeoutId)
       const persistedNotifications = Array.from(this.notifications.values()).map(entry => ({
         animeId: entry.animeId,
@@ -69,14 +71,19 @@ class NotificationService {
         episode: entry.episode
       }))
 
+      // console.log(`💾 [Save] Converted ${persistedNotifications.length} notifications for saving`)
+      // console.log(`💾 [Save] Notifications data:`, persistedNotifications)
+
       // Ensure we always save an array, never null
       const safeNotifications = persistedNotifications || []
       
+      // console.log(`💾 [Save] Writing to file: ${this.storageFile}`)
+      
       // Use Bun.write for efficient file writing
       await Bun.write(this.storageFile, JSON.stringify(safeNotifications, null, 2))
-      console.log(`💾 Saved ${safeNotifications.length} notifications to storage`)
+      console.log(`💾 [Save] Successfully saved ${safeNotifications.length} notifications to storage`)
     } catch (error) {
-      console.error('Error saving notifications:', error)
+      console.error('💾 [Save] Error saving notifications:', error)
     }
   }
 
@@ -125,9 +132,9 @@ class NotificationService {
         }
       }
       
-      // Remove the found notifications
+      // Remove the found notifications (without saving each time to avoid race condition)
       for (const key of keysToRemove) {
-        await this.removeNotification(key)
+        this.removeNotificationInternal(key)
       }
 
       const airingDate = new Date(airingAt)
@@ -146,7 +153,9 @@ class NotificationService {
         this.sendNotification(entry)
       }, timeUntilAiring)
 
+      // console.log(`🔔 [Add] Adding notification to in-memory map with key: ${notificationKey}`)
       this.notifications.set(notificationKey, entry)
+      // console.log(`🔔 [Add] In-memory map now has ${this.notifications.size} notifications`)
 
       // Save to persistent storage
       await this.saveNotifications()
@@ -163,9 +172,9 @@ class NotificationService {
   }
 
   /**
-   * Remove a notification
+   * Remove a notification (internal method without saving)
    */
-  async removeNotification(notificationKey: string): Promise<boolean> {
+  private removeNotificationInternal(notificationKey: string): boolean {
     const entry = this.notifications.get(notificationKey)
     if (entry) {
       // Clear timeout if it exists
@@ -173,10 +182,20 @@ class NotificationService {
         clearTimeout(entry.timeoutId)
       }
       this.notifications.delete(notificationKey)
-      await this.saveNotifications()
       return true
     }
     return false
+  }
+
+  /**
+   * Remove a notification
+   */
+  async removeNotification(notificationKey: string): Promise<boolean> {
+    const removed = this.removeNotificationInternal(notificationKey)
+    if (removed) {
+      await this.saveNotifications()
+    }
+    return removed
   }
 
   /**

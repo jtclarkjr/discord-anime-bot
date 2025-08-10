@@ -8,5 +8,6 @@ services:
     env_file:
       - .env
     volumes:
+      - ./data:/app/data # Mount data directory for persistent notifications
       - /app/node_modules # Prevents overwriting node_modules inside container
     command: ['bun', 'start']

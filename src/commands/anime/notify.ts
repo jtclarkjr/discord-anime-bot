@@ -30,17 +30,17 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
     return
   }
 
-  console.log(`🔔 [NotifyAdd] Starting add notification for anime ${animeId}`)
+  // console.log(`🔔 [NotifyAdd] Starting add notification for anime ${animeId}`)
 
   try {
-    console.log(`🔔 [NotifyAdd] Calling notificationService.addNotification`)
+    // console.log(`🔔 [NotifyAdd] Calling notificationService.addNotification`)
     const result = await notificationService.addNotification(
       animeId,
       interaction.channelId,
       interaction.user.id
     )
 
-    console.log(`🔔 [NotifyAdd] Result:`, result)
+    // console.log(`🔔 [NotifyAdd] Result:`, result)
 
     if (result.success) {
       const embed = new EmbedBuilder()
