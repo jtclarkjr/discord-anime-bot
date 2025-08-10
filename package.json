@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "bun src/index.ts",
-    "dev": "bun --env-file=.env src/index.ts"
+    "dev": "bun --env-file=.env src/index.ts",
+    "lint": "oxlint ./src --fix"
   },
   "author": "jtclarkjr",
   "license": "MIT",
@@ -16,6 +17,7 @@
     "openai": "^5.12.2"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.19"
+    "@types/bun": "^1.2.19",
+    "oxlint": "^1.11.1"
   }
 }
