@@ -75,6 +75,15 @@ export type ReleasingAnimeResponse = {
 }
 
 // Utility types
+export type NotificationEntry = {
+  animeId: number
+  channelId: string
+  userId: string
+  airingAt: number
+  episode: number
+  timeoutId?: NodeJS.Timeout
+}
+
 // OpenAI types
 export type AnimeMatch = {
   anime: AnimeMedia

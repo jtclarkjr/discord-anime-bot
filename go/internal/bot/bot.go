@@ -5,14 +5,16 @@ import (
 	"log"
 
 	"discord-anime-bot/internal/config"
+	"discord-anime-bot/internal/services/anilist"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 // Bot represents the Discord bot instance
 type Bot struct {
-	session *discordgo.Session
-	config  *config.Config
+	session             *discordgo.Session
+	config              *config.Config
+	notificationService *anilist.NotificationService
 }
 
 // NewBot creates a new bot instance
@@ -22,9 +24,13 @@ func NewBot(cfg *config.Config) (*Bot, error) {
 		return nil, fmt.Errorf("failed to create Discord session: %w", err)
 	}
 
+	// Initialize notification service
+	notificationService := anilist.NewNotificationService(session)
+
 	bot := &Bot{
-		session: session,
-		config:  cfg,
+		session:             session,
+		config:              cfg,
+		notificationService: notificationService,
 	}
 
 	// Add event handlers
@@ -47,6 +53,9 @@ func (b *Bot) Start() error {
 
 // Stop stops the bot
 func (b *Bot) Stop() {
+	if b.notificationService != nil {
+		b.notificationService.Cleanup()
+	}
 	if b.session != nil {
 		b.session.Close()
 	}
@@ -86,6 +95,44 @@ func (b *Bot) ready(s *discordgo.Session, event *discordgo.Ready) {
 					Name:        "id",
 					Description: "The AniList ID of the anime",
 					Required:    true,
+				},
+			},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+			Name:        "notify",
+			Description: "Episode notification commands",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Name:        "add",
+					Description: "Set notification for next episode",
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Name:        "id",
+							Description: "The AniList ID of the anime",
+							Required:    true,
+						},
+					},
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Name:        "list",
+					Description: "List your active episode notifications",
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Name:        "cancel",
+					Description: "Cancel notification for an anime",
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Name:        "id",
+							Description: "The AniList ID of the anime",
+							Required:    true,
+						},
+					},
 				},
 			},
 		},

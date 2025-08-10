@@ -109,3 +109,15 @@ type GraphQLSearchVariables struct {
 	Page    int    `json:"page"`
 	PerPage int    `json:"perPage"`
 }
+
+// NotificationEntry represents a notification entry with timer
+type NotificationEntry struct {
+	AnimeID   int    `json:"animeId"`
+	ChannelID string `json:"channelId"`
+	UserID    string `json:"userId"`
+	AiringAt  int64  `json:"airingAt"`
+	Episode   int    `json:"episode"`
+}
+
+// PersistedNotification represents a notification entry for storage (same as NotificationEntry)
+type PersistedNotification = NotificationEntry

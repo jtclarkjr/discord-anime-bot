@@ -3,17 +3,22 @@ import { handleSearchCommand } from './anime/search'
 import { handleNextCommand } from './anime/next'
 import { handleReleaseCommand } from './anime/release'
 import { handleFindCommand } from './anime/find'
+import { handleNotifyCommand } from './anime/notify'
 import { IS_OPENAI_ENABLED } from '@/config/constants'
 
 export async function handleAnimeCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
+  const subcommandGroup = interaction.options.getSubcommandGroup()
 
-  switch (subcommand) {
+  switch (subcommandGroup || subcommand) {
     case 'search':
       await handleSearchCommand(interaction)
       break
     case 'next':
       await handleNextCommand(interaction)
+      break
+    case 'notify':
+      await handleNotifyCommand(interaction)
       break
     case 'release':
       await handleReleaseCommand(interaction)
@@ -57,6 +62,44 @@ export const animeCommandDefinition = {
           type: 4, // INTEGER type
           description: 'AniList ID of the anime',
           required: true
+        }
+      ]
+    },
+    {
+      name: 'notify',
+      type: 2, // SUB_COMMAND_GROUP type
+      description: 'Episode notification commands',
+      options: [
+        {
+          name: 'add',
+          type: 1, // SUB_COMMAND type
+          description: 'Set notification for next episode',
+          options: [
+            {
+              name: 'id',
+              type: 4, // INTEGER type
+              description: 'AniList ID of the anime',
+              required: true
+            }
+          ]
+        },
+        {
+          name: 'list',
+          type: 1, // SUB_COMMAND type
+          description: 'List your active episode notifications'
+        },
+        {
+          name: 'cancel',
+          type: 1, // SUB_COMMAND type
+          description: 'Cancel notification for an anime',
+          options: [
+            {
+              name: 'id',
+              type: 4, // INTEGER type
+              description: 'AniList ID of the anime',
+              required: true
+            }
+          ]
         }
       ]
     },

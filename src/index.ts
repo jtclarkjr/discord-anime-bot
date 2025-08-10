@@ -2,6 +2,7 @@ import 'dotenv/config'
 import { Client, GatewayIntentBits } from 'discord.js'
 import { handleAnimeCommand, animeCommandDefinition } from '@/commands/index'
 import { DISCORD_TOKEN, IS_OPENAI_ENABLED } from '@/config/constants'
+import { notificationService } from '@/services/anime/notify'
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
@@ -28,6 +29,14 @@ client.on('interactionCreate', async (interaction) => {
 
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
+  
+  // Initialize notification service
+  notificationService.setClient(client)
+  
+  // Clean up expired notifications every hour
+  setInterval(async () => {
+    await notificationService.cleanup()
+  }, 60 * 60 * 1000) // 1 hour
   
   if (IS_OPENAI_ENABLED) {
     console.log('✅ OpenAI features enabled (find command available)')

@@ -60,3 +60,52 @@ func FormatAirDate(date time.Time) string {
 func FormatCompactDateTime(date time.Time) string {
 	return date.Format("Jan 2, 3:04 PM")
 }
+
+// FormatRelativeTime formats a time relative to now (e.g., "in 2 hours", "tomorrow")
+func FormatRelativeTime(t time.Time) string {
+	now := time.Now()
+	duration := t.Sub(now)
+
+	if duration < 0 {
+		return "already aired"
+	}
+
+	// Less than a minute
+	if duration < time.Minute {
+		return "in less than a minute"
+	}
+
+	// Less than an hour
+	if duration < time.Hour {
+		minutes := int(duration.Minutes())
+		if minutes == 1 {
+			return "in 1 minute"
+		}
+		return fmt.Sprintf("in %d minutes", minutes)
+	}
+
+	// Less than a day
+	if duration < 24*time.Hour {
+		hours := int(duration.Hours())
+		if hours == 1 {
+			return "in 1 hour"
+		}
+		return fmt.Sprintf("in %d hours", hours)
+	}
+
+	// Less than a week
+	if duration < 7*24*time.Hour {
+		days := int(duration.Hours() / 24)
+		if days == 1 {
+			return "tomorrow"
+		}
+		return fmt.Sprintf("in %d days", days)
+	}
+
+	// More than a week
+	weeks := int(duration.Hours() / (24 * 7))
+	if weeks == 1 {
+		return "in 1 week"
+	}
+	return fmt.Sprintf("in %d weeks", weeks)
+}

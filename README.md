@@ -6,6 +6,9 @@ A Discord bot for searching anime information and tracking release schedules usi
 
 - `/anime search <query>` - Search for anime by name
 - `/anime next <id>` - Get next episode information for an anime by AniList ID
+- `/anime notify add <id>` - Set up notification for when the next episode airs
+- `/anime notify list` - List your active episode notifications
+- `/anime notify cancel <id>` - Cancel notification for an anime
 - `/anime release` - Show all currently releasing anime
 - `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI API key)_
 
@@ -24,6 +27,7 @@ src/
 │   │   ├── next.ts         # Next episode API service
 │   │   ├── release.ts      # Releasing anime API service
 │   │   ├── find.ts         # AI-powered anime finder service
+│   │   ├── notify.ts       # Episode notification service
 │   │   └── index.ts        # Anime services exports
 │   ├── openai/
 │   │   ├── completions.ts  # OpenAI ChatGPT completion service
@@ -56,6 +60,14 @@ src/
 - Displays air date in user-friendly format
 - Handles finished/cancelled anime appropriately
 
+### Notification Commands
+
+- **Add**: Set up automatic notifications for when episodes air with `/anime notify add <id>`
+- **List**: View all your active episode notifications with `/anime notify list`
+- **Cancel**: Remove notifications for specific anime with `/anime notify cancel <id>`
+- Notifications are sent automatically when episodes air
+- One notification per anime per user is maintained
+
 ### Release Command
 
 - Lists currently releasing anime
@@ -74,6 +86,17 @@ src/
   - "Romance anime set in high school with supernatural elements"
   - "Sci-fi mecha anime with philosophical themes"
 - Displays up to 15 anime with pagination info
+
+## Episode Notifications
+
+The bot includes an automatic notification system for new episode releases:
+
+- **Set Notifications**: Use `/anime notify add <id>` to get notified when an episode airs
+- **Automatic Delivery**: Notifications are sent in the same channel where you set them up
+- **Smart Scheduling**: The bot calculates exact air times and schedules notifications accordingly
+- **One Per Anime**: Only one notification per anime per user is maintained
+- **Easy Management**: List active notifications with `/anime notify list` and cancel with `/anime notify cancel <id>`
+- **Error Handling**: Gracefully handles finished anime, invalid IDs, and scheduling conflicts
 
 ## Setup
 
