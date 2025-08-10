@@ -1,0 +1,29 @@
+# Binaries
+bin/
+*.exe
+
+# Dependencies
+vendor/
+
+# Go build cache
+.cache/
+
+# Environment files
+.env
+.env.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Air (development) files
+tmp/
