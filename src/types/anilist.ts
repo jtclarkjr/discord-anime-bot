@@ -32,15 +32,9 @@ export type AnimeMedia = {
   siteUrl: string
 }
 
-export type AnimeDetails = {
-  id: number
-  title: AnimeTitle
-  status: string
-  format: string
+export type AnimeDetails = AnimeMedia & {
   episodes: number | null
   nextAiringEpisode: NextAiringEpisode | null
-  coverImage: CoverImage
-  siteUrl: string
 }
 
 export type ReleasingAnime = {
@@ -50,37 +44,32 @@ export type ReleasingAnime = {
 }
 
 // Response types
-export type AnimeSearchResponse = {
+export type AniListPageResponse<T> = {
   data: {
     Page: {
-      media: AnimeMedia[]
+      media: T[]
       pageInfo: PageInfo
     }
   }
 }
 
-export type AnimeDetailsResponse = {
+export type AniListSingleResponse<T> = {
   data: {
-    Media: AnimeDetails
+    Media: T
   }
 }
 
-export type ReleasingAnimeResponse = {
-  data: {
-    Page: {
-      media: ReleasingAnime[]
-      pageInfo: PageInfo
-    }
-  }
-}
+export type AnimeSearchResponse = AniListPageResponse<AnimeMedia>
+
+export type AnimeDetailsResponse = AniListSingleResponse<AnimeDetails>
+
+export type ReleasingAnimeResponse = AniListPageResponse<ReleasingAnime>
 
 // Utility types
-export type NotificationEntry = {
+export type NotificationEntry = Pick<NextAiringEpisode, 'episode' | 'airingAt'> & {
   animeId: number
   channelId: string
   userId: string
-  airingAt: number
-  episode: number
   timeoutId?: NodeJS.Timeout
 }
 

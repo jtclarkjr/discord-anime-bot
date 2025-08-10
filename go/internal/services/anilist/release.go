@@ -39,7 +39,7 @@ func GetReleasingAnime(page, perPage int) (*types.ReleasingAnimeResponse, error)
 		PerPage: perPage,
 	}
 
-	requestBody := types.GraphQLRequest{
+	requestBody := types.GraphQLRequest[types.GraphQLSearchVariables]{
 		Query:     query,
 		Variables: variables,
 	}

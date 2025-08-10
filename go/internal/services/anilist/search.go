@@ -45,7 +45,7 @@ func SearchAnime(query string, page, perPage int) (*types.SearchResponse, error)
 		PerPage: perPage,
 	}
 
-	requestBody := types.GraphQLRequest{
+	requestBody := types.GraphQLRequest[types.GraphQLSearchVariables]{
 		Query:     searchQuery,
 		Variables: variables,
 	}

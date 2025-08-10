@@ -20,10 +20,15 @@ type CoverImage struct {
 	Large string `json:"large"`
 }
 
+// EpisodeInfo represents basic episode and airing information
+type EpisodeInfo struct {
+	Episode  int `json:"episode"`
+	AiringAt int `json:"airingAt"`
+}
+
 // NextAiringEpisode represents information about the next airing episode
 type NextAiringEpisode struct {
-	Episode         int `json:"episode"`
-	AiringAt        int `json:"airingAt"`
+	EpisodeInfo
 	TimeUntilAiring int `json:"timeUntilAiring,omitempty"`
 }
 
@@ -56,32 +61,30 @@ type ReleasingAnime struct {
 	NextAiringEpisode *NextAiringEpisode `json:"nextAiringEpisode"`
 }
 
-// SearchResponse represents the response from AniList search API
-type SearchResponse struct {
+// Generic response types
+type AniListPageResponse[T any] struct {
 	Data struct {
 		Page struct {
-			PageInfo PageInfo     `json:"pageInfo"`
-			Media    []AnimeMedia `json:"media"`
+			PageInfo PageInfo `json:"pageInfo"`
+			Media    []T      `json:"media"`
 		} `json:"Page"`
 	} `json:"data"`
 }
+
+type AniListSingleResponse[T any] struct {
+	Data struct {
+		Media T `json:"Media"`
+	} `json:"data"`
+}
+
+// SearchResponse represents the response from AniList search API
+type SearchResponse = AniListPageResponse[AnimeMedia]
 
 // AnimeDetailsResponse represents the response from AniList anime details API
-type AnimeDetailsResponse struct {
-	Data struct {
-		Media AnimeDetails `json:"Media"`
-	} `json:"data"`
-}
+type AnimeDetailsResponse = AniListSingleResponse[AnimeDetails]
 
 // ReleasingAnimeResponse represents the response from AniList releasing anime API
-type ReleasingAnimeResponse struct {
-	Data struct {
-		Page struct {
-			PageInfo PageInfo         `json:"pageInfo"`
-			Media    []ReleasingAnime `json:"media"`
-		} `json:"Page"`
-	} `json:"data"`
-}
+type ReleasingAnimeResponse = AniListPageResponse[ReleasingAnime]
 
 // AnimeMatch represents a match found by AI with confidence and reasoning
 type AnimeMatch struct {
@@ -97,10 +100,10 @@ type OpenAIRecommendation struct {
 	Confidence float64 `json:"confidence"`
 }
 
-// GraphQLRequest represents a GraphQL request structure
-type GraphQLRequest struct {
-	Query     string                 `json:"query"`
-	Variables GraphQLSearchVariables `json:"variables"`
+// GraphQLRequest represents a generic GraphQL request structure
+type GraphQLRequest[T any] struct {
+	Query     string `json:"query"`
+	Variables T      `json:"variables"`
 }
 
 // GraphQLSearchVariables represents variables for GraphQL search query
@@ -110,13 +113,18 @@ type GraphQLSearchVariables struct {
 	PerPage int    `json:"perPage"`
 }
 
+// GraphQLNextVariables represents variables for GraphQL next episode query
+type GraphQLNextVariables struct {
+	ID int `json:"id"`
+}
+
 // NotificationEntry represents a notification entry with timer
 type NotificationEntry struct {
 	AnimeID   int    `json:"animeId"`
 	ChannelID string `json:"channelId"`
 	UserID    string `json:"userId"`
-	AiringAt  int64  `json:"airingAt"`
 	Episode   int    `json:"episode"`
+	AiringAt  int64  `json:"airingAt"`
 }
 
 // PersistedNotification represents a notification entry for storage (same as NotificationEntry)

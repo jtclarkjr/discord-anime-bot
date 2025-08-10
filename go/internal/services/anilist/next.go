@@ -9,17 +9,6 @@ import (
 	"discord-anime-bot/internal/types"
 )
 
-// GraphQLNextVariables represents variables for GraphQL next episode query
-type GraphQLNextVariables struct {
-	ID int `json:"id"`
-}
-
-// GraphQLNextRequest represents a GraphQL request for next episode
-type GraphQLNextRequest struct {
-	Query     string               `json:"query"`
-	Variables GraphQLNextVariables `json:"variables"`
-}
-
 // GetAnimeByID gets anime details by ID including next airing episode
 func GetAnimeByID(animeID int) (*types.AnimeDetails, error) {
 	query := `
@@ -46,11 +35,11 @@ func GetAnimeByID(animeID int) (*types.AnimeDetails, error) {
 		}
 	}`
 
-	variables := GraphQLNextVariables{
+	variables := types.GraphQLNextVariables{
 		ID: animeID,
 	}
 
-	requestBody := GraphQLNextRequest{
+	requestBody := types.GraphQLRequest[types.GraphQLNextVariables]{
 		Query:     query,
 		Variables: variables,
 	}
