@@ -112,7 +112,7 @@ func (b *Bot) handleFindCommand(s *discordgo.Session, i *discordgo.InteractionCr
 			{Name: "AI Confidence", Value: fmt.Sprintf("%d%%", int(math.Round(bestMatch.Confidence*100))), Inline: true},
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: "Powered by ChatGPT-4 + AniList",
+			Text: "Powered by GPT-5 + AniList",
 		},
 	}
 

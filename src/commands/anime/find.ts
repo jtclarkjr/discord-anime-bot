@@ -42,7 +42,7 @@ export async function handleFindCommand(interaction: ChatInputCommandInteraction
         { name: 'AI Confidence', value: `${Math.round(bestMatch.confidence * 100)}%`, inline: true }
       )
       .setColor(0x00FF00)
-      .setFooter({ text: 'Powered by ChatGPT-5 + AniList' })
+      .setFooter({ text: 'Powered by GPT-5 + AniList' })
 
     let responseText = `🤖 **AI Found Anime Based on:** "${prompt}"\n\n`
     
