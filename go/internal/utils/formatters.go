@@ -41,24 +41,34 @@ func FormatCountdown(timeUntil int) string {
 	return timeString
 }
 
-// FormatDate formats a date to user-friendly format
+// FormatDate formats a date to user-friendly format (Discord timestamp)
+// Format: <t:timestamp:D> - Shows date only (e.g., "December 25, 2023")
 func FormatDate(date time.Time) string {
-	return date.Format("Monday, January 2, 2006")
+	return fmt.Sprintf("<t:%d:D>", date.Unix())
 }
 
-// FormatTime formats time to user-friendly format (12-hour)
+// FormatTime formats time to user-friendly format (Discord timestamp)
+// Format: <t:timestamp:t> - Shows time only (e.g., "3:30 PM")
 func FormatTime(date time.Time) string {
-	return date.Format("3:04 PM")
+	return fmt.Sprintf("<t:%d:t>", date.Unix())
 }
 
-// FormatAirDate formats date and time for air date display
+// FormatAirDate formats date and time for air date display (Discord timestamp)
+// Format: <t:timestamp:F> - Full date and time (e.g., "Monday, December 25, 2023 3:30 PM")
 func FormatAirDate(date time.Time) string {
-	return fmt.Sprintf("%s at %s", FormatDate(date), FormatTime(date))
+	return fmt.Sprintf("<t:%d:F>", date.Unix())
 }
 
-// FormatCompactDateTime formats compact date and time for lists
+// FormatCompactDateTime formats compact date and time for lists (Discord timestamp)
+// Format: <t:timestamp:f> - Short date and time (e.g., "December 25, 2023 3:30 PM")
 func FormatCompactDateTime(date time.Time) string {
-	return date.Format("Jan 2, 3:04 PM")
+	return fmt.Sprintf("<t:%d:f>", date.Unix())
+}
+
+// FormatRelativeTimestamp formats a time as Discord relative timestamp
+// Format: <t:timestamp:R> - Relative time (e.g., "in 2 hours", "3 days ago")
+func FormatRelativeTimestamp(date time.Time) string {
+	return fmt.Sprintf("<t:%d:R>", date.Unix())
 }
 
 // FormatRelativeTime formats a time relative to now (e.g., "in 2 hours", "tomorrow")

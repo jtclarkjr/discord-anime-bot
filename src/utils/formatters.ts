@@ -15,47 +15,41 @@ export function formatCountdown(timeUntil: number): string {
 }
 
 /**
- * Format a date to user-friendly format
+ * Format a date to user-friendly format (Discord timestamp)
+ * Format: <t:timestamp:D> - Shows date only (e.g., "December 25, 2023")
  */
 export function formatDate(date: Date): string {
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }
-  return date.toLocaleDateString('en-US', dateOptions)
+  return `<t:${Math.floor(date.getTime() / 1000)}:D>`
 }
 
 /**
- * Format time to user-friendly format (12-hour)
+ * Format time to user-friendly format (Discord timestamp)
+ * Format: <t:timestamp:t> - Shows time only (e.g., "3:30 PM")
  */
 export function formatTime(date: Date): string {
-  const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  }
-  return date.toLocaleTimeString('en-US', timeOptions)
+  return `<t:${Math.floor(date.getTime() / 1000)}:t>`
 }
 
 /**
- * Format date and time for air date display
+ * Format date and time for air date display (Discord timestamp)
+ * Format: <t:timestamp:F> - Full date and time (e.g., "Monday, December 25, 2023 3:30 PM")
  */
 export function formatAirDate(date: Date): string {
-  return `${formatDate(date)} at ${formatTime(date)}`
+  return `<t:${Math.floor(date.getTime() / 1000)}:F>`
 }
 
 /**
- * Format compact date and time for lists
+ * Format compact date and time for lists (Discord timestamp)
+ * Format: <t:timestamp:f> - Short date and time (e.g., "December 25, 2023 3:30 PM")
  */
 export function formatCompactDateTime(date: Date): string {
-  const timeOptions: Intl.DateTimeFormatOptions = {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  }
-  return date.toLocaleDateString('en-US', timeOptions)
+  return `<t:${Math.floor(date.getTime() / 1000)}:f>`
+}
+
+/**
+ * Format a time as Discord relative timestamp
+ * Format: <t:timestamp:R> - Relative time (e.g., "in 2 hours", "3 days ago")
+ */
+export function formatRelativeTimestamp(date: Date): string {
+  return `<t:${Math.floor(date.getTime() / 1000)}:R>`
 }

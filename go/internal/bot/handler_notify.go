@@ -79,7 +79,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	}
 
 	airingTime := time.Unix(int64(nextEpisode.AiringAt), 0)
-	relativeTime := utils.FormatRelativeTime(airingTime)
+	relativeTime := utils.FormatRelativeTimestamp(airingTime)
 
 	embed := &discordgo.MessageEmbed{
 		Title:       "🔔 Notification Added",
@@ -132,7 +132,7 @@ func (b *Bot) handleNotifyListCommand(s *discordgo.Session, i *discordgo.Interac
 		}
 
 		airingTime := time.Unix(notification.AiringAt, 0)
-		relativeTime := utils.FormatRelativeTime(airingTime)
+		relativeTime := utils.FormatRelativeTimestamp(airingTime)
 		description.WriteString(fmt.Sprintf("• **%s** - Episode %d airs %s (ID: %d)\n", title, notification.Episode, relativeTime, notification.AnimeID))
 	}
 
