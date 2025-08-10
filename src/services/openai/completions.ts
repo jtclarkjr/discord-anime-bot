@@ -1,15 +1,23 @@
 import OpenAI from 'openai'
-import { OPENAI_API_KEY } from '@/config/constants'
+import { OPENAI_API_KEY, IS_OPENAI_ENABLED } from '@/config/constants'
 import type { AnimeRecommendation } from '@/types/openai'
 
-const openai = new OpenAI({
-  apiKey: OPENAI_API_KEY
-})
+let openai: OpenAI | null = null
+
+if (IS_OPENAI_ENABLED && OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: OPENAI_API_KEY
+  })
+}
 
 /**
  * Find anime recommendations based on a description using ChatGPT-5
  */
 export async function findAnimeByDescription(description: string): Promise<AnimeRecommendation[]> {
+  if (!openai || !IS_OPENAI_ENABLED) {
+    throw new Error('OpenAI is not configured. Please set OPENAI_API_KEY environment variable.')
+  }
+
   try {
     const prompt = `Find 3 anime that match: "${description}"
 

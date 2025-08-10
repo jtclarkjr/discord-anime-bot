@@ -4,7 +4,7 @@ A Discord bot written in Go that helps users find and search for anime using AI-
 
 ## Features
 
-- **AI-Powered Anime Search**: Use natural language descriptions to find anime with GPT-5
+- **AI-Powered Anime Search**: Use natural language descriptions to find anime with GPT-5 _(requires OpenAI API key)_
 - **Traditional Search**: Search anime by title using AniList API
 - **Rich Discord Embeds**: Beautiful embedded responses with anime details
 - **Slash Commands**: Modern Discord slash command interface
@@ -13,7 +13,7 @@ A Discord bot written in Go that helps users find and search for anime using AI-
 
 ### `/anime find <prompt>`
 
-Find anime using AI based on a description.
+Find anime using AI based on a description. _(Requires OpenAI API key)_
 
 **Example**: `/anime find "anime about a kid who becomes a pirate"`
 
@@ -29,17 +29,24 @@ Search for anime by title.
 
 - Go 1.21 or higher
 - Discord Bot Token
-- OpenAI API Key
 - AniList API endpoint (typically `https://graphql.anilist.co`)
+- OpenAI API Key (optional, for AI-powered search features)
 
 ### Environment Variables
 
 Create a `.env` file in the root directory:
 
+**Required:**
+
 ```env
 DISCORD_BOT_TOKEN=your_discord_bot_token_here
 CHANNEL_ID=your_channel_id_here
 ANILIST_API=https://graphql.anilist.co
+```
+
+**Optional (for AI features):**
+
+```env
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 

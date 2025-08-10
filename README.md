@@ -7,7 +7,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime search <query>` - Search for anime by name
 - `/anime next <id>` - Get next episode information for an anime by AniList ID
 - `/anime release` - Show all currently releasing anime
-- `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5)
+- `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI API key)_
 
 ## Project Structure
 
@@ -100,10 +100,15 @@ src/
 
 ## Environment Variables
 
+**Required:**
+
 - `DISCORD_BOT_TOKEN` - Your Discord bot token
 - `CHANNEL_ID` - The Discord channel ID where the bot operates
 - `ANILIST_API` - AniList GraphQL API endpoint (https://graphql.anilist.co)
-- `OPENAI_API_KEY` - Your OpenAI API key for ChatGPT-5 access
+
+**Optional:**
+
+- `OPENAI_API_KEY` - Your OpenAI API key for ChatGPT-5 access (enables `/anime find` command)
 
 ## Technologies Used
 

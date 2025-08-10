@@ -38,6 +38,10 @@ func (b *Bot) interactionCreate(s *discordgo.Session, i *discordgo.InteractionCr
 	subcommand := options[0]
 	switch subcommand.Name {
 	case "find":
+		if !b.config.IsOpenAIEnabled {
+			b.respondWithError(s, i, "❌ The find command is disabled because OpenAI API key is not configured.")
+			return
+		}
 		b.handleFindCommand(s, i, subcommand.Options)
 	case "search":
 		b.handleSearchCommand(s, i, subcommand.Options)
@@ -52,6 +56,11 @@ func (b *Bot) interactionCreate(s *discordgo.Session, i *discordgo.InteractionCr
 
 // handleFindCommand handles the anime find subcommand
 func (b *Bot) handleFindCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
+	if !b.config.IsOpenAIEnabled {
+		b.respondWithError(s, i, "❌ The find command is disabled because OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable to use AI-powered anime search.")
+		return
+	}
+
 	if len(options) == 0 {
 		b.respondWithError(s, i, "Please provide a description to search for anime.")
 		return

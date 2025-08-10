@@ -3,6 +3,7 @@ import { handleSearchCommand } from './anime/search'
 import { handleNextCommand } from './anime/next'
 import { handleReleaseCommand } from './anime/release'
 import { handleFindCommand } from './anime/find'
+import { IS_OPENAI_ENABLED } from '@/config/constants'
 
 export async function handleAnimeCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
@@ -18,6 +19,10 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
       await handleReleaseCommand(interaction)
       break
     case 'find':
+      if (!IS_OPENAI_ENABLED) {
+        await interaction.reply('❌ The find command is disabled because OpenAI API key is not configured.')
+        return
+      }
       await handleFindCommand(interaction)
       break
     default:
@@ -60,7 +65,7 @@ export const animeCommandDefinition = {
       type: 1, // SUB_COMMAND type
       description: 'Show all currently releasing anime'
     },
-    {
+    ...(IS_OPENAI_ENABLED ? [{
       name: 'find',
       type: 1, // SUB_COMMAND type
       description: 'Find anime using AI based on description',
@@ -72,6 +77,6 @@ export const animeCommandDefinition = {
           required: true
         }
       ]
-    }
+    }] : [])
   ]
 }

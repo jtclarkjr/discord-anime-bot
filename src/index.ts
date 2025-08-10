@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client, GatewayIntentBits } from 'discord.js'
 import { handleAnimeCommand, animeCommandDefinition } from '@/commands/index'
-import { DISCORD_TOKEN } from '@/config/constants'
+import { DISCORD_TOKEN, IS_OPENAI_ENABLED } from '@/config/constants'
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
@@ -28,6 +28,12 @@ client.on('interactionCreate', async (interaction) => {
 
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
+  
+  if (IS_OPENAI_ENABLED) {
+    console.log('✅ OpenAI features enabled (find command available)')
+  } else {
+    console.log('⚠️ OpenAI features disabled (find command not available)')
+  }
 
   // Register the /anime command with subcommands
   const guild = client.guilds.cache.first()

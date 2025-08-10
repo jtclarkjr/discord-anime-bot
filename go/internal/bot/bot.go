@@ -56,57 +56,66 @@ func (b *Bot) Stop() {
 func (b *Bot) ready(s *discordgo.Session, event *discordgo.Ready) {
 	log.Printf("Logged in as %s!", s.State.User.Username)
 
+	// Create base command options
+	commandOptions := []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "search",
+			Description: "Search for anime by title",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "query",
+					Description: "The anime title to search for",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "release",
+			Description: "Get currently releasing anime",
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "next",
+			Description: "Get next episode information for an anime",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "id",
+					Description: "The AniList ID of the anime",
+					Required:    true,
+				},
+			},
+		},
+	}
+
+	// Conditionally add the find command if OpenAI is enabled
+	if b.config.IsOpenAIEnabled {
+		findOption := &discordgo.ApplicationCommandOption{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "find",
+			Description: "Find anime by description using AI",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "prompt",
+					Description: "Describe the anime you're looking for",
+					Required:    true,
+				},
+			},
+		}
+		// Prepend find command to the beginning for better UX
+		commandOptions = append([]*discordgo.ApplicationCommandOption{findOption}, commandOptions...)
+	}
+
 	// Register the /anime command with subcommands
 	commands := []*discordgo.ApplicationCommand{
 		{
 			Name:        "anime",
 			Description: "Anime-related commands",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "find",
-					Description: "Find anime by description using AI",
-					Options: []*discordgo.ApplicationCommandOption{
-						{
-							Type:        discordgo.ApplicationCommandOptionString,
-							Name:        "prompt",
-							Description: "Describe the anime you're looking for",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "search",
-					Description: "Search for anime by title",
-					Options: []*discordgo.ApplicationCommandOption{
-						{
-							Type:        discordgo.ApplicationCommandOptionString,
-							Name:        "query",
-							Description: "The anime title to search for",
-							Required:    true,
-						},
-					},
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "release",
-					Description: "Get currently releasing anime",
-				},
-				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "next",
-					Description: "Get next episode information for an anime",
-					Options: []*discordgo.ApplicationCommandOption{
-						{
-							Type:        discordgo.ApplicationCommandOptionInteger,
-							Name:        "id",
-							Description: "The AniList ID of the anime",
-							Required:    true,
-						},
-					},
-				},
-			},
+			Options:     commandOptions,
 		},
 	}
 

@@ -1,11 +1,16 @@
 import { searchAnime } from './search'
 import { findAnimeByDescription } from '@/services/openai/completions'
+import { IS_OPENAI_ENABLED } from '@/config/constants'
 import type { AnimeMatch } from '@/types/anilist'
 
 /**
  * Find anime using AI description and return AniList details
  */
 export async function findAnimeWithDetails(description: string): Promise<AnimeMatch[]> {
+  if (!IS_OPENAI_ENABLED) {
+    throw new Error('OpenAI is not configured. Please set OPENAI_API_KEY environment variable to use AI-powered anime search.')
+  }
+
   try {
     // Get AI recommendations
     const recommendations = await findAnimeByDescription(description)

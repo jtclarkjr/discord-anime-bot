@@ -1,6 +1,7 @@
 package anilist
 
 import (
+	"fmt"
 	"log"
 
 	"discord-anime-bot/internal/services/openai"
@@ -9,6 +10,10 @@ import (
 
 // FindAnimeWithDetails finds anime using AI description and returns AniList details
 func FindAnimeWithDetails(description, openAIAPIKey string) ([]types.AnimeMatch, error) {
+	if openAIAPIKey == "" {
+		return nil, fmt.Errorf("OpenAI is not configured. Please set OPENAI_API_KEY environment variable to use AI-powered anime search")
+	}
+
 	// Get AI recommendations
 	recommendations, err := openai.FindAnimeByDescription(description, openAIAPIKey)
 	if err != nil {

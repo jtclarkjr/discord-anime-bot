@@ -1,7 +1,13 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 import { findAnimeWithDetails } from '@/services/anime/find'
+import { IS_OPENAI_ENABLED } from '@/config/constants'
 
 export async function handleFindCommand(interaction: ChatInputCommandInteraction) {
+  if (!IS_OPENAI_ENABLED) {
+    await interaction.reply('❌ The find command is disabled because OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable to use AI-powered anime search.')
+    return
+  }
+
   const prompt = interaction.options.getString('prompt')
   if (!prompt) {
     await interaction.reply('❌ Please provide a description to search for anime.')
