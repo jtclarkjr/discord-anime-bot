@@ -45,7 +45,7 @@ func NewNotificationService(session *discordgo.Session) *NotificationService {
 	service := &NotificationService{
 		notifications: make(map[string]*notificationTimer),
 		session:       session,
-		filePath:      "data/notifications.json",
+		filePath:      "../data/notifications.json",
 	}
 
 	// Load existing notifications
@@ -67,21 +67,34 @@ func (ns *NotificationService) loadNotifications() {
 		return
 	}
 
-	var persistedNotifications []types.PersistedNotification
-	if err := json.Unmarshal(data, &persistedNotifications); err != nil {
-		log.Printf("Error parsing notifications file: %v", err)
+	// Handle edge case where file contains "null" instead of empty array
+	if string(data) == "null" || string(data) == "" {
+		log.Printf("Notifications file is null or empty, initializing with empty array")
 		return
 	}
 
+	var persistedNotifications []types.PersistedNotification
+	if err := json.Unmarshal(data, &persistedNotifications); err != nil {
+		log.Printf("Error parsing notifications file: %v", err)
+		// Reset file to empty array if parsing fails
+		if err := ns.saveNotificationsInternal(); err != nil {
+			log.Printf("Failed to reset notifications file: %v", err)
+		}
+		return
+	}
+
+	log.Printf("Successfully parsed %d notifications from file", len(persistedNotifications))
+
 	// Recreate timers for future notifications
 	for _, pn := range persistedNotifications {
-		airingTime := time.Unix(pn.AiringAt, 0)
+		// Convert from milliseconds (TypeScript format) to seconds for Go
+		airingTime := time.Unix(pn.AiringAt/1000, 0)
 		if airingTime.After(time.Now()) {
 			notification := types.NotificationEntry{
 				AnimeID:   pn.AnimeID,
 				ChannelID: pn.ChannelID,
 				UserID:    pn.UserID,
-				AiringAt:  pn.AiringAt,
+				AiringAt:  pn.AiringAt / 1000, // Convert to seconds for storage
 				Episode:   pn.Episode,
 			}
 
@@ -96,8 +109,14 @@ func (ns *NotificationService) loadNotifications() {
 func (ns *NotificationService) saveNotifications() error {
 	ns.mu.RLock()
 	defer ns.mu.RUnlock()
+	return ns.saveNotificationsInternal()
+}
 
-	var persistedNotifications []types.PersistedNotification
+// saveNotificationsInternal saves notifications without acquiring locks (internal use)
+func (ns *NotificationService) saveNotificationsInternal() error {
+	// Initialize as empty slice to ensure JSON marshals as [] not null
+	persistedNotifications := make([]types.PersistedNotification, 0)
+
 	for _, timer := range ns.notifications {
 		persistedNotifications = append(persistedNotifications, types.PersistedNotification{
 			AnimeID:   timer.Entry.AnimeID,
@@ -117,6 +136,8 @@ func (ns *NotificationService) saveNotifications() error {
 		return fmt.Errorf("failed to marshal notifications: %w", err)
 	}
 
+	log.Printf("💾 Saved %d notifications to storage", len(persistedNotifications))
+
 	if err := os.WriteFile(ns.filePath, data, 0644); err != nil {
 		return fmt.Errorf("failed to write notifications file: %w", err)
 	}
@@ -126,13 +147,20 @@ func (ns *NotificationService) saveNotifications() error {
 }
 
 // createNotificationKey creates a unique key for a notification
-func createNotificationKey(animeID int, userID string) string {
-	return fmt.Sprintf("%d:%s", animeID, userID)
+func createNotificationKey(animeID int, channelID, userID string) string {
+	return fmt.Sprintf("%d-%s-%s", animeID, channelID, userID)
 }
 
-// scheduleNotification sets up a timer for the notification
+// scheduleNotification sets up a timer for the notification (with locking)
 func (ns *NotificationService) scheduleNotification(entry *types.NotificationEntry) {
-	notificationKey := createNotificationKey(entry.AnimeID, entry.UserID)
+	ns.mu.Lock()
+	defer ns.mu.Unlock()
+	ns.scheduleNotificationInternal(entry)
+}
+
+// scheduleNotificationInternal sets up a timer for the notification (without locking)
+func (ns *NotificationService) scheduleNotificationInternal(entry *types.NotificationEntry) {
+	notificationKey := createNotificationKey(entry.AnimeID, entry.ChannelID, entry.UserID)
 
 	// Calculate delay until airing time
 	airingTime := time.Unix(entry.AiringAt, 0)
@@ -150,17 +178,18 @@ func (ns *NotificationService) scheduleNotification(entry *types.NotificationEnt
 			return
 		default:
 			ns.sendNotification(entry)
-			ns.removeNotificationInternal(notificationKey)
+			// Remove the notification after sending (no saving needed since it's fired)
+			ns.mu.Lock()
+			delete(ns.notifications, notificationKey)
+			ns.mu.Unlock()
 		}
 	})
 
-	ns.mu.Lock()
 	ns.notifications[notificationKey] = &notificationTimer{
 		Entry:      entry,
 		Timer:      timer,
 		CancelFunc: cancel,
 	}
-	ns.mu.Unlock()
 
 	log.Printf("⏰ Scheduled notification for anime %d in %v", entry.AnimeID, delay)
 }
@@ -220,7 +249,7 @@ func (ns *NotificationService) removeNotificationInternal(key string) {
 
 // AddNotification adds a new episode notification
 func (ns *NotificationService) AddNotification(animeID int, channelID, userID string, airingAt time.Time, episode int) error {
-	notificationKey := createNotificationKey(animeID, userID)
+	notificationKey := createNotificationKey(animeID, channelID, userID)
 
 	ns.mu.Lock()
 	defer ns.mu.Unlock()
@@ -240,16 +269,18 @@ func (ns *NotificationService) AddNotification(animeID int, channelID, userID st
 		Episode:   episode,
 	}
 
-	// Schedule the notification
-	ns.scheduleNotification(entry)
+	log.Printf("🔔 Adding notification for anime %d, episode %d", animeID, episode)
 
-	// Save to file
-	return ns.saveNotifications()
+	// Schedule the notification (internal method that doesn't acquire locks)
+	ns.scheduleNotificationInternal(entry)
+
+	// Save to file (using internal method to avoid deadlock)
+	return ns.saveNotificationsInternal()
 }
 
 // RemoveNotification removes a notification for a specific anime and user
-func (ns *NotificationService) RemoveNotification(animeID int, userID string) error {
-	notificationKey := createNotificationKey(animeID, userID)
+func (ns *NotificationService) RemoveNotification(animeID int, channelID, userID string) error {
+	notificationKey := createNotificationKey(animeID, channelID, userID)
 
 	ns.mu.Lock()
 	defer ns.mu.Unlock()
@@ -263,8 +294,8 @@ func (ns *NotificationService) RemoveNotification(animeID int, userID string) er
 	timer.CancelFunc()
 	delete(ns.notifications, notificationKey)
 
-	// Save to file
-	return ns.saveNotifications()
+	// Save to file (using internal method to avoid deadlock)
+	return ns.saveNotificationsInternal()
 }
 
 // GetUserNotifications returns all notifications for a specific user
@@ -294,7 +325,7 @@ func (ns *NotificationService) Cleanup() {
 		timer.CancelFunc()
 	}
 
-	if err := ns.saveNotifications(); err != nil {
+	if err := ns.saveNotificationsInternal(); err != nil {
 		log.Printf("Error saving notifications during cleanup: %v", err)
 	}
 

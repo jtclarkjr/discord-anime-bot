@@ -22,20 +22,25 @@ export async function handleNotifyCommand(interaction: ChatInputCommandInteracti
 }
 
 async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) {
+  await interaction.deferReply()
+
   const animeId = interaction.options.getInteger('id')
   if (!animeId) {
-    await interaction.reply('❌ Please provide a valid anime ID.')
+    await interaction.editReply('❌ Please provide a valid anime ID.')
     return
   }
 
-  await interaction.deferReply()
+  console.log(`🔔 [NotifyAdd] Starting add notification for anime ${animeId}`)
 
   try {
+    console.log(`🔔 [NotifyAdd] Calling notificationService.addNotification`)
     const result = await notificationService.addNotification(
       animeId,
       interaction.channelId,
       interaction.user.id
     )
+
+    console.log(`🔔 [NotifyAdd] Result:`, result)
 
     if (result.success) {
       const embed = new EmbedBuilder()
@@ -56,8 +61,12 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
       await interaction.editReply(`❌ ${result.message}`)
     }
   } catch (error) {
-    console.error('Error in notify add command:', error)
-    await interaction.editReply('❌ An error occurred while setting up the notification.')
+    console.error('🔔 [NotifyAdd] Error in notify add command:', error)
+    try {
+      await interaction.editReply('❌ An error occurred while setting up the notification.')
+    } catch (replyError) {
+      console.error('🔔 [NotifyAdd] Failed to send error reply:', replyError)
+    }
   }
 }
 
@@ -96,13 +105,13 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
 }
 
 async function handleNotifyCancelCommand(interaction: ChatInputCommandInteraction) {
+  await interaction.deferReply()
+
   const animeId = interaction.options.getInteger('id')
   if (!animeId) {
-    await interaction.reply('❌ Please provide a valid anime ID.')
+    await interaction.editReply('❌ Please provide a valid anime ID.')
     return
   }
-
-  await interaction.deferReply()
 
   try {
     const removed = await notificationService.removeUserNotification(
@@ -126,6 +135,10 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
     }
   } catch (error) {
     console.error('Error in notify cancel command:', error)
-    await interaction.editReply('❌ An error occurred while canceling the notification.')
+    try {
+      await interaction.editReply('❌ An error occurred while canceling the notification.')
+    } catch (replyError) {
+      console.error('Failed to send error reply:', replyError)
+    }
   }
 }

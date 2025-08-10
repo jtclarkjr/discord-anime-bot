@@ -69,9 +69,12 @@ class NotificationService {
         episode: entry.episode
       }))
 
+      // Ensure we always save an array, never null
+      const safeNotifications = persistedNotifications || []
+      
       // Use Bun.write for efficient file writing
-      await Bun.write(this.storageFile, JSON.stringify(persistedNotifications, null, 2))
-      console.log(`💾 Saved ${persistedNotifications.length} notifications to storage`)
+      await Bun.write(this.storageFile, JSON.stringify(safeNotifications, null, 2))
+      console.log(`💾 Saved ${safeNotifications.length} notifications to storage`)
     } catch (error) {
       console.error('Error saving notifications:', error)
     }
@@ -115,10 +118,16 @@ class NotificationService {
       }
       
       // Remove any other notifications for this anime by this user (in case they exist in other channels)
+      const keysToRemove: string[] = []
       for (const [key, entry] of this.notifications.entries()) {
         if (entry.animeId === animeId && entry.userId === userId) {
-          this.removeNotification(key)
+          keysToRemove.push(key)
         }
+      }
+      
+      // Remove the found notifications
+      for (const key of keysToRemove) {
+        await this.removeNotification(key)
       }
 
       const airingDate = new Date(airingAt)
@@ -158,8 +167,11 @@ class NotificationService {
    */
   async removeNotification(notificationKey: string): Promise<boolean> {
     const entry = this.notifications.get(notificationKey)
-    if (entry && entry.timeoutId) {
-      clearTimeout(entry.timeoutId)
+    if (entry) {
+      // Clear timeout if it exists
+      if (entry.timeoutId) {
+        clearTimeout(entry.timeoutId)
+      }
       this.notifications.delete(notificationKey)
       await this.saveNotifications()
       return true

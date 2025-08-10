@@ -35,7 +35,13 @@ func (b *Bot) handleNotifyCommand(s *discordgo.Session, i *discordgo.Interaction
 // handleNotifyAddCommand handles adding a notification
 func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
 	if len(options) == 0 {
-		b.respondWithError(s, i, "Please provide an anime ID")
+		message := "Please provide an anime ID"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
@@ -47,12 +53,24 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	nextEpisode, err := anilist.GetNextEpisode(animeID)
 	if err != nil {
 		log.Printf("Error getting next episode for anime %d: %v", animeID, err)
-		b.respondWithError(s, i, "❌ Failed to get anime information")
+		message := "❌ Failed to get anime information"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
 	if nextEpisode == nil {
-		b.respondWithError(s, i, "❌ No upcoming episodes found for this anime")
+		message := "❌ No upcoming episodes found for this anime"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
@@ -60,7 +78,13 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	err = b.notificationService.AddNotification(animeID, channelID, userID, time.Unix(int64(nextEpisode.AiringAt), 0), nextEpisode.Episode)
 	if err != nil {
 		log.Printf("Error adding notification: %v", err)
-		b.respondWithError(s, i, "❌ Failed to add notification")
+		message := "❌ Failed to add notification"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
@@ -68,7 +92,13 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	anime, err := anilist.GetAnimeByID(animeID)
 	if err != nil {
 		log.Printf("Error getting anime details: %v", err)
-		b.respondWithError(s, i, "❌ Failed to get anime information")
+		message := "❌ Failed to get anime information"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
@@ -153,17 +183,30 @@ func (b *Bot) handleNotifyListCommand(s *discordgo.Session, i *discordgo.Interac
 // handleNotifyCancelCommand handles cancelling a notification
 func (b *Bot) handleNotifyCancelCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
 	if len(options) == 0 {
-		b.respondWithError(s, i, "Please provide an anime ID")
+		message := "Please provide an anime ID"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
 	animeID := int(options[0].IntValue())
 	userID := i.Member.User.ID
+	channelID := i.ChannelID
 
-	err := b.notificationService.RemoveNotification(animeID, userID)
+	err := b.notificationService.RemoveNotification(animeID, channelID, userID)
 	if err != nil {
 		log.Printf("Error removing notification: %v", err)
-		b.respondWithError(s, i, "❌ Failed to cancel notification")
+		message := "❌ Failed to cancel notification"
+		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Content: &message,
+		})
+		if err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
