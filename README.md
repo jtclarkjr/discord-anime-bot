@@ -7,7 +7,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime search <query>` - Search for anime by name
 - `/anime next <id>` - Get next episode information for an anime by AniList ID
 - `/anime release` - Show all currently releasing anime
-- `/anime find <prompt>` - Find anime using AI based on description (powered by ChatGPT-5)
+- `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5)
 
 ## Project Structure
 
