@@ -60,8 +60,6 @@ class NotificationService {
    */
   private async saveNotifications() {
     try {
-      // console.log(`💾 [Save] Starting save process. In-memory notifications count: ${this.notifications.size}`)
-      
       // Convert to persistable format (without timeoutId)
       const persistedNotifications = Array.from(this.notifications.values()).map(entry => ({
         animeId: entry.animeId,
@@ -71,13 +69,8 @@ class NotificationService {
         episode: entry.episode
       }))
 
-      // console.log(`💾 [Save] Converted ${persistedNotifications.length} notifications for saving`)
-      // console.log(`💾 [Save] Notifications data:`, persistedNotifications)
-
       // Ensure we always save an array, never null
       const safeNotifications = persistedNotifications || []
-      
-      // console.log(`💾 [Save] Writing to file: ${this.storageFile}`)
       
       // Use Bun.write for efficient file writing
       await Bun.write(this.storageFile, JSON.stringify(safeNotifications, null, 2))
@@ -153,9 +146,7 @@ class NotificationService {
         this.sendNotification(entry)
       }, timeUntilAiring)
 
-      // console.log(`🔔 [Add] Adding notification to in-memory map with key: ${notificationKey}`)
       this.notifications.set(notificationKey, entry)
-      // console.log(`🔔 [Add] In-memory map now has ${this.notifications.size} notifications`)
 
       // Save to persistent storage
       await this.saveNotifications()

@@ -30,7 +30,7 @@ export type AnimeMedia = {
   id: number
   title: AnimeTitle
   format: string
-  status: string
+  status: AnimeStatus
   coverImage: CoverImage
   siteUrl: string
 }
