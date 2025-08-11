@@ -1,5 +1,5 @@
 import type { ReleasingAnimeResponse } from '@/types/anilist'
-import { ANILIST_API } from '@/config/constants'
+import { makeAniListRequest } from '@/utils/request'
 
 /**
  * Get all currently releasing anime
@@ -26,12 +26,6 @@ export async function getReleasingAnime(page: number = 1, perPage: number = 25) 
     perPage
   }
 
-  const res = await fetch(ANILIST_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables })
-  })
-
-  const json = (await res.json()) as ReleasingAnimeResponse
+  const json = (await makeAniListRequest(query, variables)) as ReleasingAnimeResponse
   return json.data.Page
 }

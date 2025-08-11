@@ -1,5 +1,5 @@
 import type { SeasonAnimeResponse } from '@/types/anilist'
-import { ANILIST_API } from '@/config/constants'
+import { makeAniListRequest } from '@/utils/request'
 
 /**
  * Get anime for a specific season and year
@@ -27,17 +27,7 @@ export async function getSeasonAnime(season: string, seasonYear: number, page: n
     perPage
   }
 
-  const res = await fetch(ANILIST_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables })
-  })
-
-  if (!res.ok) {
-    throw new Error(`AniList API error: ${res.status}`)
-  }
-
-  const json = (await res.json()) as SeasonAnimeResponse
+  const json = (await makeAniListRequest(query, variables)) as SeasonAnimeResponse
   
   if (json.errors) {
     throw new Error(`AniList GraphQL error: ${json.errors[0]?.message}`)

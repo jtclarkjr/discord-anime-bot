@@ -1,5 +1,5 @@
 import type { AnimeDetailsResponse, AnimeDetails } from '@/types/anilist'
-import { ANILIST_API } from '@/config/constants'
+import { makeAniListRequest } from '@/utils/request'
 
 /**
  * Get anime details by ID including next airing episode
@@ -28,12 +28,6 @@ export async function getAnimeById(animeId: number): Promise<AnimeDetails | null
     id: animeId
   }
 
-  const res = await fetch(ANILIST_API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables })
-  })
-
-  const json = (await res.json()) as AnimeDetailsResponse
+  const json = (await makeAniListRequest(query, variables)) as AnimeDetailsResponse
   return json.data.Media
 }
