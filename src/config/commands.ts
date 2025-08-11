@@ -73,6 +73,31 @@ export const animeCommandDefinition = {
       type: 1, // SUB_COMMAND type
       description: 'Show all currently releasing anime'
     },
+    {
+      name: 'season',
+      type: 1, // SUB_COMMAND type
+      description: 'Get all anime from a specific season and year',
+      options: [
+        {
+          name: 'season',
+          type: 3, // STRING type
+          description: 'Season (winter, spring, summer, fall)',
+          required: true,
+          choices: [
+            { name: 'Winter', value: 'winter' },
+            { name: 'Spring', value: 'spring' },
+            { name: 'Summer', value: 'summer' },
+            { name: 'Fall', value: 'fall' }
+          ]
+        },
+        {
+          name: 'year',
+          type: 4, // INTEGER type
+          description: 'Year (defaults to current year)',
+          required: false
+        }
+      ]
+    },
     ...(IS_OPENAI_ENABLED ? [{
       name: 'find',
       type: 1, // SUB_COMMAND type

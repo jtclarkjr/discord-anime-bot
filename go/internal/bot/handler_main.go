@@ -40,6 +40,8 @@ func (b *Bot) interactionCreate(s *discordgo.Session, i *discordgo.InteractionCr
 		b.handleSearchCommand(s, i, subcommand.Options)
 	case "release":
 		b.handleReleaseCommand(s, i)
+	case "season":
+		b.handleSeasonCommand(s, i, subcommand.Options)
 	case "next":
 		b.handleNextCommand(s, i, subcommand.Options)
 	case "notify":

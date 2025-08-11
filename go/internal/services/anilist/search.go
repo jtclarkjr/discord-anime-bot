@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"discord-anime-bot/internal/types"
 )
 
-const anilistAPI = "https://graphql.anilist.co"
-
 // SearchAnime searches for anime using the AniList GraphQL API
 func SearchAnime(query string, page, perPage int) (*types.SearchResponse, error) {
+	anilistAPI := os.Getenv("ANILIST_API")
 	searchQuery := `
 	query ($search: String, $page: Int, $perPage: Int) {
 		Page(page: $page, perPage: $perPage) {

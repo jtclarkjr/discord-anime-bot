@@ -1,5 +1,6 @@
 export { searchAnime } from './search'
 export { getAnimeById } from './next'
 export { getReleasingAnime } from './release'
+export { getSeasonAnime } from './season'
 export { findAnimeWithDetails } from './find'
 export type { AnimeMatch } from '@/types/anilist'

@@ -31,6 +31,16 @@ Search for anime by title.
 
 Display currently releasing anime with their next episode schedules.
 
+### `/anime season <season> [year]`
+
+Get all anime from a specific season and year.
+
+**Examples**:
+
+- `/anime season summer` - Shows all Summer 2025 anime
+- `/anime season winter 2023` - Shows all Winter 2023 anime
+- `/anime season fall 2024` - Shows all Fall 2024 anime
+
 ### `/anime next <id>`
 
 Get information about the next episode of a specific anime.
@@ -111,6 +121,7 @@ go/
 │   │   ├── handler_find.go         # AI-powered anime search
 │   │   ├── handler_search.go       # Traditional anime search
 │   │   ├── handler_release.go      # Currently releasing anime
+│   │   ├── handler_season.go       # Seasonal anime listings
 │   │   ├── handler_next.go         # Next episode information
 │   │   └── handler_notify.go       # Episode notification system
 │   ├── config/                     # Configuration management
@@ -120,6 +131,7 @@ go/
 │   │   │   ├── search.go           # Anime search functionality
 │   │   │   ├── find.go             # AI-powered search
 │   │   │   ├── release.go          # Currently releasing anime
+│   │   │   ├── season.go           # Seasonal anime data
 │   │   │   ├── next.go             # Next episode data
 │   │   │   └── notify.go           # Notification service
 │   │   └── openai/                 # OpenAI API integration

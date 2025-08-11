@@ -1,4 +1,6 @@
 // Base types
+export type AnimeStatus = 'RELEASING' | 'FINISHED' | 'NOT_YET_RELEASED' | 'CANCELLED' | 'HIATUS'
+
 export type PageInfo = {
   total: number
   currentPage: number
@@ -13,6 +15,7 @@ export type AnimeTitle = {
 }
 
 export type CoverImage = {
+  medium: string
   large: string
 }
 
@@ -43,6 +46,13 @@ export type ReleasingAnime = {
   nextAiringEpisode: Omit<NextAiringEpisode, 'timeUntilAiring'> | null
 }
 
+export type SeasonAnime = {
+  id: number
+  title: Pick<AnimeTitle, 'romaji' | 'english'>
+  coverImage: Pick<CoverImage, 'medium' | 'large'>
+  status: AnimeStatus
+}
+
 // Response types
 export type AniListPageResponse<T> = {
   data: {
@@ -51,6 +61,7 @@ export type AniListPageResponse<T> = {
       pageInfo: PageInfo
     }
   }
+  errors?: Array<{ message: string }>
 }
 
 export type AniListSingleResponse<T> = {
@@ -64,6 +75,8 @@ export type AnimeSearchResponse = AniListPageResponse<AnimeMedia>
 export type AnimeDetailsResponse = AniListSingleResponse<AnimeDetails>
 
 export type ReleasingAnimeResponse = AniListPageResponse<ReleasingAnime>
+
+export type SeasonAnimeResponse = AniListPageResponse<SeasonAnime>
 
 // Utility types
 export type NotificationEntry = Pick<NextAiringEpisode, 'episode' | 'airingAt'> & {

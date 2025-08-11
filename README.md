@@ -10,6 +10,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime notify list` - List your active episode notifications
 - `/anime notify cancel <id>` - Cancel notification for an anime
 - `/anime release` - Show all currently releasing anime
+- `/anime season <season> [year]` - Get all anime from a specific season and year
 - `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI API key)_
 
 ## Project Structure
@@ -26,6 +27,7 @@ src/
 │   │   ├── search.ts       # Search anime API service
 │   │   ├── next.ts         # Next episode API service
 │   │   ├── release.ts      # Releasing anime API service
+│   │   ├── season.ts       # Seasonal anime API service
 │   │   ├── find.ts         # AI-powered anime finder service
 │   │   ├── notify.ts       # Episode notification service
 │   │   └── index.ts        # Anime services exports
@@ -38,6 +40,7 @@ src/
 │   │   ├── search.ts       # Search anime command handler
 │   │   ├── next.ts         # Next episode command handler
 │   │   ├── release.ts      # Releasing anime command handler
+│   │   ├── season.ts       # Seasonal anime command handler
 │   │   ├── find.ts         # AI find anime command handler
 │   │   └── index.ts        # Command routing and definitions
 ├── utils/
@@ -74,6 +77,25 @@ src/
 - Shows next episode numbers and air dates
 - Sorted by popularity
 - Displays up to 15 anime with pagination info
+
+### Season Command
+
+- Get all anime from a specific season and year
+- Supports all four seasons: Winter, Spring, Summer, Fall
+- Year parameter is optional (defaults to current year)
+- Shows **complete** seasonal listings (not truncated like other commands)
+- Displays status indicators with emojis:
+  - 🟢 Currently Releasing
+  - ✅ Finished
+  - 🔜 Not Yet Released
+  - ❌ Cancelled
+  - ⏸️ On Hiatus
+- Automatically handles multiple embeds for large seasonal catalogs
+- Sorted by popularity from AniList
+- Examples:
+  - `/anime season summer` - Shows all Summer 2025 anime
+  - `/anime season winter 2023` - Shows all Winter 2023 anime
+  - `/anime season fall 2024` - Shows all Fall 2024 anime
 
 ### Find Command (AI-Powered)
 

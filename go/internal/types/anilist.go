@@ -17,7 +17,8 @@ type AnimeTitle struct {
 
 // CoverImage represents anime cover image URLs
 type CoverImage struct {
-	Large string `json:"large"`
+	Medium string `json:"medium"`
+	Large  string `json:"large"`
 }
 
 // EpisodeInfo represents basic episode and airing information
@@ -61,6 +62,14 @@ type ReleasingAnime struct {
 	NextAiringEpisode *NextAiringEpisode `json:"nextAiringEpisode"`
 }
 
+// SeasonAnime represents anime from a specific season
+type SeasonAnime struct {
+	ID         int        `json:"id"`
+	Title      AnimeTitle `json:"title"`
+	CoverImage CoverImage `json:"coverImage"`
+	Status     string     `json:"status"`
+}
+
 // Generic response types
 type AniListPageResponse[T any] struct {
 	Data struct {
@@ -85,6 +94,9 @@ type AnimeDetailsResponse = AniListSingleResponse[AnimeDetails]
 
 // ReleasingAnimeResponse represents the response from AniList releasing anime API
 type ReleasingAnimeResponse = AniListPageResponse[ReleasingAnime]
+
+// SeasonAnimeResponse represents the response from AniList seasonal anime API
+type SeasonAnimeResponse = AniListPageResponse[SeasonAnime]
 
 // AnimeMatch represents a match found by AI with confidence and reasoning
 type AnimeMatch struct {
@@ -116,6 +128,15 @@ type GraphQLSearchVariables struct {
 // GraphQLNextVariables represents variables for GraphQL next episode query
 type GraphQLNextVariables struct {
 	ID int `json:"id"`
+}
+
+// GraphQLSeasonVariables represents variables for GraphQL season query
+type GraphQLSeasonVariables struct {
+	Season     string `json:"season"`
+	SeasonYear int    `json:"seasonYear"`
+	Type       string `json:"type"`
+	Page       int    `json:"page"`
+	PerPage    int    `json:"perPage"`
 }
 
 // NotificationEntry represents a notification entry with timer

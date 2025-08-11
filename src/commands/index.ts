@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js'
 import { handleSearchCommand } from './anime/search'
 import { handleNextCommand } from './anime/next'
 import { handleReleaseCommand } from './anime/release'
+import { handleSeasonCommand } from './anime/season'
 import { handleFindCommand } from './anime/find'
 import { handleNotifyCommand } from './anime/notify'
 import { IS_OPENAI_ENABLED } from '@/config/constants'
@@ -23,6 +24,9 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
       break
     case 'release':
       await handleReleaseCommand(interaction)
+      break
+    case 'season':
+      await handleSeasonCommand(interaction)
       break
     case 'find':
       if (!IS_OPENAI_ENABLED) {

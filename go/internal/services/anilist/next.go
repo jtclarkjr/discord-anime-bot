@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 
 	"discord-anime-bot/internal/types"
 )
 
 // GetAnimeByID gets anime details by ID including next airing episode
 func GetAnimeByID(animeID int) (*types.AnimeDetails, error) {
+	anilistAPI := os.Getenv("ANILIST_API")
 	query := `
 	query ($id: Int!) {
 		Media(id: $id, type: ANIME) {
