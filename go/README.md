@@ -23,7 +23,7 @@ Find anime using AI based on a description. _(Requires OpenAI API key)_
 
 ### `/anime search <query>`
 
-Search for anime by title.
+Search for anime by title or AniList ID.
 
 **Example**: `/anime search "One Piece"`
 

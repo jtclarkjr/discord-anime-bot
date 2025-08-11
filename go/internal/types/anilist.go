@@ -125,6 +125,11 @@ type GraphQLSearchVariables struct {
 	PerPage int    `json:"perPage"`
 }
 
+// GraphQLSearchByIDVariables represents variables for GraphQL search by ID query
+type GraphQLSearchByIDVariables struct {
+	ID int `json:"id"`
+}
+
 // GraphQLNextVariables represents variables for GraphQL next episode query
 type GraphQLNextVariables struct {
 	ID int `json:"id"`
