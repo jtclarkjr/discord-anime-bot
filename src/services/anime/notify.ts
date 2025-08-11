@@ -220,7 +220,7 @@ class NotificationService {
       if (!anime) return
 
       const title = anime.title.english || anime.title.romaji
-      const message = `🎉 <@${entry.userId}> Episode ${entry.episode} of **${title}** has just aired!\n\n🔗 [Watch on AniList](${anime.siteUrl})`
+      const message = `🎉 <@${entry.userId}> Episode ${entry.episode} of **${title}** has just aired!\n\n🔗 [AniList Details](${anime.siteUrl})`
 
       await channel.send(message)
       
