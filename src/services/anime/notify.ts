@@ -99,8 +99,12 @@ class NotificationService {
         return { success: false, message: `No upcoming episodes scheduled for ${anime.title.english || anime.title.romaji}` }
       }
 
-      if (anime.status === 'FINISHED' || anime.status === 'CANCELLED') {
+      if (anime.status === 'FINISHED') {
         return { success: false, message: `This anime has finished airing` }
+      }
+
+      if (anime.status === 'CANCELLED') {
+        return { success: false, message: `This anime has been cancelled` }
       }
 
       const airingAt = anime.nextAiringEpisode.airingAt * 1000 // Convert to milliseconds
