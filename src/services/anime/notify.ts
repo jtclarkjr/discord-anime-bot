@@ -25,7 +25,8 @@ async function loadNotifications() {
       return
     }
     const data = await file.text()
-    const persistedNotifications = JSON.parse(data)
+    const parseJson = <T>(json: string): T => JSON.parse(json) as T
+    const persistedNotifications = parseJson<NotificationEntry[]>(data)
     const now = Date.now()
     for (const notification of persistedNotifications) {
       if (notification.airingAt <= now) {
