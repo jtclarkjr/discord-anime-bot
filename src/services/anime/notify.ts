@@ -171,15 +171,10 @@ class NotificationService {
    */
   private removeNotificationInternal(notificationKey: string): boolean {
     const entry = this.notifications.get(notificationKey)
-    if (entry) {
-      // Clear timeout if it exists
-      if (entry.timeoutId) {
-        clearTimeout(entry.timeoutId)
-      }
-      this.notifications.delete(notificationKey)
-      return true
+    if (entry?.timeoutId) {
+      clearTimeout(entry.timeoutId)
     }
-    return false
+    return this.notifications.delete(notificationKey)
   }
 
   /**
