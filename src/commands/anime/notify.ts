@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 import { getAnimeById } from '@/services/anime/next'
 import { formatAirDate } from '@/utils/formatters'
-import { notificationService } from '@/services/anime/notify'
+import { addNotification, getUserNotifications, removeUserNotification } from '@/services/anime/notify'
 
 export async function handleNotifyCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
@@ -34,7 +34,7 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
 
   try {
     // console.log(`🔔 [NotifyAdd] Calling notificationService.addNotification`)
-    const result = await notificationService.addNotification(
+    const result = await addNotification(
       animeId,
       interaction.channelId,
       interaction.user.id
@@ -74,7 +74,7 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
   await interaction.deferReply()
 
   try {
-    const notifications = notificationService.getUserNotifications(interaction.user.id)
+  const notifications = getUserNotifications(interaction.user.id)
     
     if (notifications.length === 0) {
       await interaction.editReply('📋 You have no active episode notifications.')
@@ -114,7 +114,7 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
   }
 
   try {
-    const removed = await notificationService.removeUserNotification(
+    const removed = await removeUserNotification(
       animeId,
       interaction.channelId,
       interaction.user.id
