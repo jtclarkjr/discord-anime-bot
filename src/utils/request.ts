@@ -3,7 +3,7 @@ import { ANILIST_API } from "@config/constants"
 /**
  * Helper function to make GraphQL requests to AniList API
  */
-export const makeAniListRequest = async (query: string, variables: any) => {
+export const makeAniListRequest = async (query: string, variables: unknown) => {
   const res = await fetch(ANILIST_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

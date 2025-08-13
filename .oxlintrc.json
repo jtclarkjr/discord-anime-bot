@@ -1,5 +1,9 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "no-unused-vars": "deny",
+    "no-explicit-any": "deny"
+  },  
   "ignorePatterns": [
     "node_modules/"
   ]
