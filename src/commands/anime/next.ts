@@ -32,7 +32,8 @@ export async function handleNextCommand(interaction: ChatInputCommandInteraction
         timeString: formatCountdown(anime.nextAiringEpisode.timeUntilAiring || 0)
       }
     }
-  const embed = createNextAnimeEmbed(anime, { isFinished, nextAiringEpisode })
+    
+    const embed = createNextAnimeEmbed(anime, { isFinished, nextAiringEpisode })
 
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {

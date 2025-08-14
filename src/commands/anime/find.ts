@@ -29,7 +29,7 @@ export async function handleFindCommand(interaction: ChatInputCommandInteraction
     const bestMatch = matches[0]
     const anime = bestMatch.anime
     
-  const embed = createFindAnimeEmbed(anime, bestMatch)
+    const embed = createFindAnimeEmbed(anime, bestMatch)
 
     let responseText = `🤖 **AI Found Anime Based on:** "${prompt}"\n\n`
     

@@ -21,7 +21,7 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
 
     // Create embed for the first result
     const anime = searchResults.media[0]
-  const embed = createSearchAnimeEmbed(anime)
+    const embed = createSearchAnimeEmbed(anime)
 
     let responseText = `Found ${searchResults.pageInfo.total} result(s) for "${searchQuery}"`
     if (searchResults.media.length > 1) {

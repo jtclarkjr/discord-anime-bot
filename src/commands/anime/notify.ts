@@ -120,8 +120,8 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
       const anime = await getAnimeById(animeId)
       const title = anime ? (anime.title.english || anime.title.romaji) : `Anime ID ${animeId}`
       
-  const embed = createNotifyCancelEmbed(`Notification canceled for **${title}**`)
-  await interaction.editReply({ embeds: [embed] })
+      const embed = createNotifyCancelEmbed(`Notification canceled for **${title}**`)
+      await interaction.editReply({ embeds: [embed] })
     } else {
       await interaction.editReply('❌ No active notification found for this anime.')
     }
