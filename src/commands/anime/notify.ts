@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 import { getAnimeById } from '@/services/anime/next'
 import { formatAirDate } from '@/utils/formatters'
 import { addNotification, getUserNotifications, removeUserNotification } from '@/services/anime/notify'
+import { createNotifyListEmbed, createNotifyCancelEmbed } from '@/embeds/notifyAnimeEmbed'
 
 export async function handleNotifyCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
@@ -81,10 +82,6 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
       return
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle('📋 Your Active Episode Notifications')
-      .setColor(0x02A9FF)
-
     let description = ''
     for (const notification of notifications) {
       const anime = await getAnimeById(notification.animeId)
@@ -95,8 +92,7 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
         description += `  Episode ${notification.episode} - ${formatAirDate(airingDate)}\n\n`
       }
     }
-
-    embed.setDescription(description)
+    const embed = createNotifyListEmbed(description)
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {
     console.error('Error in notify list command:', error)
@@ -124,12 +120,8 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
       const anime = await getAnimeById(animeId)
       const title = anime ? (anime.title.english || anime.title.romaji) : `Anime ID ${animeId}`
       
-      const embed = new EmbedBuilder()
-        .setTitle('🗑️ Notification Canceled')
-        .setDescription(`Notification canceled for **${title}**`)
-        .setColor(0xFF9900)
-
-      await interaction.editReply({ embeds: [embed] })
+  const embed = createNotifyCancelEmbed(`Notification canceled for **${title}**`)
+  await interaction.editReply({ embeds: [embed] })
     } else {
       await interaction.editReply('❌ No active notification found for this anime.')
     }

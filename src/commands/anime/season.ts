@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
+import { createSeasonAnimeEmbeds } from '@/embeds/seasonAnimeEmbeds'
 import { getSeasonAnime } from '@/services/anime/season'
 import type { AnimeStatus } from '@/types/anilist'
 
@@ -23,33 +24,12 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
       return
     }
 
-    // Create multiple embeds if necessary (Discord has a 4096 character limit for description)
-    const animePerEmbed = 20
-    const totalEmbeds = Math.ceil(seasonAnime.media.length / animePerEmbed)
-    const embeds: EmbedBuilder[] = []
-
-    for (let i = 0; i < totalEmbeds; i++) {
-      const startIndex = i * animePerEmbed
-      const endIndex = Math.min(startIndex + animePerEmbed, seasonAnime.media.length)
-      const animeSlice = seasonAnime.media.slice(startIndex, endIndex)
-
-      const animeList = animeSlice.map((anime, index) => {
-        const title = anime.title.english || anime.title.romaji
-        const statusEmoji = getStatusEmoji(anime.status)
-        return `${startIndex + index + 1}. **${title}** ${statusEmoji} (ID: ${anime.id})`
-      }).join('\n')
-
-      const embed = new EmbedBuilder()
-        .setTitle(`${season.charAt(0).toUpperCase() + season.slice(1)} ${year} Anime${totalEmbeds > 1 ? ` (Part ${i + 1}/${totalEmbeds})` : ''}`)
-        .setDescription(animeList)
-        .setColor(0x02A9FF)
-        
-      if (i === 0) {
-        embed.setFooter({ text: `Showing all ${seasonAnime.media.length} anime from ${season} ${year}` })
-      }
-
-      embeds.push(embed)
-    }
+    const embeds = createSeasonAnimeEmbeds({
+      season,
+      year,
+      animeMedia: seasonAnime.media,
+      getStatusEmoji,
+    })
 
     // Discord allows up to 10 embeds per message
     if (embeds.length <= 10) {

@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
+import { createSearchAnimeEmbed } from '@/embeds/searchAnimeEmbed'
 import { searchAnime } from '@/services/anime/search'
 
 export async function handleSearchCommand(interaction: ChatInputCommandInteraction) {
@@ -20,18 +21,7 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
 
     // Create embed for the first result
     const anime = searchResults.media[0]
-    const embed = new EmbedBuilder()
-      .setTitle(anime.title.english || anime.title.romaji)
-      .setURL(anime.siteUrl)
-      .setThumbnail(anime.coverImage.large)
-      .addFields(
-        { name: 'Romaji Title', value: anime.title.romaji, inline: true },
-        { name: 'Native Title', value: anime.title.native, inline: true },
-        { name: 'Format', value: anime.format, inline: true },
-        { name: 'Status', value: anime.status, inline: true },
-        { name: 'AniList ID', value: anime.id.toString(), inline: true }
-      )
-      .setColor(0x02A9FF)
+  const embed = createSearchAnimeEmbed(anime)
 
     let responseText = `Found ${searchResults.pageInfo.total} result(s) for "${searchQuery}"`
     if (searchResults.media.length > 1) {

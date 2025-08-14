@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
+import { createReleaseAnimeEmbed } from '@/embeds/releaseAnimeEmbed'
 import { getReleasingAnime } from '@/services/anime/release'
 import { formatCompactDateTime } from '@/utils/formatters'
 
@@ -29,11 +30,11 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
       return `**${title}** (ID: ${anime.id})${nextEpisodeInfo}`
     }).join('\n')
 
-    const embed = new EmbedBuilder()
-      .setTitle('Currently Releasing Anime')
-      .setDescription(animeList)
-      .setColor(0x02A9FF)
-      .setFooter({ text: `Showing ${Math.min(15, releasingAnime.media.length)} of ${releasingAnime.pageInfo.total} releasing anime` })
+    const embed = createReleaseAnimeEmbed(
+      animeList,
+      Math.min(15, releasingAnime.media.length),
+      releasingAnime.pageInfo.total
+    )
 
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {
