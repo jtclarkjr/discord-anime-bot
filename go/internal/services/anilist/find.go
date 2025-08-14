@@ -1,23 +1,42 @@
 package anilist
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
+	"discord-anime-bot/internal/config"
+	"discord-anime-bot/internal/services/claude"
 	"discord-anime-bot/internal/services/openai"
 	"discord-anime-bot/internal/types"
 )
 
 // FindAnimeWithDetails finds anime using AI description and returns AniList details
-func FindAnimeWithDetails(description, openAIAPIKey string) ([]types.AnimeMatch, error) {
-	if openAIAPIKey == "" {
-		return nil, fmt.Errorf("OpenAI is not configured. Please set OPENAI_API_KEY environment variable to use AI-powered anime search")
+func FindAnimeWithDetails(description string, cfg *config.Config) ([]types.AnimeMatch, error) {
+	if !cfg.IsAIEnabled {
+		return nil, fmt.Errorf("AI is not configured. Please set OPENAI_API_KEY or CLAUDE_API_KEY environment variable to use AI-powered anime search")
 	}
 
-	// Get AI recommendations
-	recommendations, err := openai.FindAnimeByDescription(description, openAIAPIKey)
-	if err != nil {
-		return nil, err
+	var recommendations []types.OpenAIRecommendation
+	var err error
+
+	if cfg.IsOpenAIEnabled {
+		recommendations, err = openai.FindAnimeByDescription(description, cfg.OpenAIAPIKey)
+		if err != nil {
+			return nil, err
+		}
+	} else if cfg.IsClaudeEnabled {
+		claudeClient := claude.NewClaudeClient()
+		if claudeClient == nil {
+			return nil, fmt.Errorf("claude is not configured. Please set CLAUDE_API_KEY environment variable to use AI-powered anime search")
+		}
+		jsonStr, err := claudeClient.FindAnimeByDescription(description)
+		if err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal([]byte(jsonStr), &recommendations); err != nil {
+			return nil, fmt.Errorf("failed to parse Claude response: %w", err)
+		}
 	}
 
 	var matches []types.AnimeMatch

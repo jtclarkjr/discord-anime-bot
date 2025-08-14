@@ -11,7 +11,11 @@ type Config struct {
 	ChannelID       string
 	AniListAPI      string
 	OpenAIAPIKey    string
+	ClaudeAPIKey    string
 	IsOpenAIEnabled bool
+	IsClaudeEnabled bool
+	IsAIEnabled     bool
+	UseOpenAI       bool // true if OpenAI should be used, false if Claude should be used
 }
 
 // LoadConfig loads configuration from environment variables
@@ -21,9 +25,13 @@ func LoadConfig() *Config {
 		ChannelID:    getEnv("CHANNEL_ID"),
 		AniListAPI:   getEnv("ANILIST_API"),
 		OpenAIAPIKey: getEnvOptional("OPENAI_API_KEY"),
+		ClaudeAPIKey: getEnvOptional("CLAUDE_API_KEY"),
 	}
 
 	cfg.IsOpenAIEnabled = cfg.OpenAIAPIKey != ""
+	cfg.IsClaudeEnabled = cfg.ClaudeAPIKey != ""
+	cfg.IsAIEnabled = cfg.IsOpenAIEnabled || cfg.IsClaudeEnabled
+	cfg.UseOpenAI = cfg.IsOpenAIEnabled || (!cfg.IsOpenAIEnabled && cfg.IsClaudeEnabled == false)
 
 	// Validate required environment variables
 	validateConfig(cfg)
@@ -58,10 +66,12 @@ func validateConfig(cfg *Config) {
 		log.Fatal("❌ ANILIST_API is not set in environment variables.")
 	}
 
-	// OpenAI is optional - if not provided, AI features will be disabled
+	// AI logic
 	if cfg.IsOpenAIEnabled {
 		log.Println("✅ OpenAI features enabled (find command available)")
+	} else if cfg.IsClaudeEnabled {
+		log.Println("✅ Claude features enabled (find command available)")
 	} else {
-		log.Println("⚠️ OpenAI features disabled (find command not available)")
+		log.Println("⚠️ No AI features enabled (find command not available)")
 	}
 }

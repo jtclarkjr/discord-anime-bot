@@ -29,8 +29,8 @@ func (b *Bot) handleFindCommand(s *discordgo.Session, i *discordgo.InteractionCr
 		return
 	}
 
-	// Find anime using AI
-	matches, err := anilist.FindAnimeWithDetails(prompt, b.config.OpenAIAPIKey)
+	// Find anime using AI (OpenAI or Claude, based on config)
+	matches, err := anilist.FindAnimeWithDetails(prompt, b.config)
 	if err != nil {
 		log.Printf("Error finding anime: %v", err)
 		b.respondWithError(s, i, "❌ An error occurred while searching for anime.")
