@@ -1,6 +1,8 @@
 export const DISCORD_TOKEN = process.env.DISCORD_BOT_TOKEN!
 export const ANILIST_API = process.env.ANILIST_API!
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY 
+export const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
+
 const CHANNEL_ID = process.env.CHANNEL_ID!
 
 // Validate that required environment variables are set
@@ -17,11 +19,14 @@ if (!ANILIST_API) {
   process.exit(1)
 }
 
-// OpenAI is optional - if not provided, AI features will be disabled
-if (!OPENAI_API_KEY) {
-  console.warn('⚠️ OPENAI_API_KEY is not set. AI-powered features (like /anime find) will be disabled.')
+
+// AI is enabled if either OpenAI or Claude key is present
+if (!OPENAI_API_KEY && !CLAUDE_API_KEY) {
+  console.warn('⚠️ No AI API key is set. AI-powered features (like /anime find) will be disabled.')
 }
 
 export const IS_OPENAI_ENABLED = !!OPENAI_API_KEY
+export const IS_CLAUDE_ENABLED = !!CLAUDE_API_KEY
+export const IS_AI_ENABLED = !!OPENAI_API_KEY || !!CLAUDE_API_KEY
 
 export const storageFile = './data/notifications.json'

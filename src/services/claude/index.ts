@@ -1,0 +1,1 @@
+export { findAnimeByDescriptionClaude } from './completions'
