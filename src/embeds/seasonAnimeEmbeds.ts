@@ -13,9 +13,8 @@ export function createSeasonAnimeEmbeds({
 }): EmbedBuilder[] {
   const animePerEmbed = 20
   const totalEmbeds = Math.ceil(animeMedia.length / animePerEmbed)
-  const embeds: EmbedBuilder[] = []
 
-  for (let i = 0; i < totalEmbeds; i++) {
+  return Array.from({ length: totalEmbeds }, (_, i) => {
     const startIndex = i * animePerEmbed
     const endIndex = Math.min(startIndex + animePerEmbed, animeMedia.length)
     const animeSlice = animeMedia.slice(startIndex, endIndex)
@@ -35,8 +34,6 @@ export function createSeasonAnimeEmbeds({
       embed.setFooter({ text: `Showing all ${animeMedia.length} anime from ${season} ${year}` })
     }
 
-    embeds.push(embed)
-  }
-
-  return embeds
+    return embed
+  })
 }
