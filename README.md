@@ -4,6 +4,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 
 ## Commands
 
+- `/anime help` - Show all available anime commands, subcommands, and arguments
 - `/anime search <query>` - Search for anime by name or AniList ID
 - `/anime next <id>` - Get next episode information for an anime by AniList ID
 - `/anime notify add <id>` - Set up notification for when the next episode airs
@@ -12,6 +13,10 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime release` - Show all currently releasing anime
 - `/anime season <season> [year]` - Get all anime from a specific season and year
 - `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI API key)_
+
+## Help Command
+
+Use `/anime help` to see a full list of all available commands, subcommands, and their arguments. The help output is always up-to-date with the bot's features and shows usage for every command, including subcommand groups and required/optional arguments.
 
 ## Project Structure
 
