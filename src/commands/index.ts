@@ -6,6 +6,7 @@ import { handleSeasonCommand } from './anime/season'
 import { handleFindCommand } from './anime/find'
 import { handleNotifyCommand } from './anime/notify'
 import { IS_OPENAI_ENABLED } from '@/config/constants'
+import { handleHelpCommand } from './anime/help'
 export { animeCommandDefinition } from '@/config/commands'
 
 export async function handleAnimeCommand(interaction: ChatInputCommandInteraction) {
@@ -34,6 +35,9 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
         return
       }
       await handleFindCommand(interaction)
+      break
+    case 'help':
+      await handleHelpCommand(interaction)
       break
     default:
       await interaction.reply('❌ Unknown subcommand.')

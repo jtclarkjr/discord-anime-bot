@@ -98,7 +98,7 @@ export const animeCommandDefinition = {
         }
       ]
     },
-    ...(IS_OPENAI_ENABLED ? [{
+  ...(IS_OPENAI_ENABLED ? [{
       name: 'find',
       type: 1, // SUB_COMMAND type
       description: 'Find anime using AI based on description',
@@ -110,6 +110,11 @@ export const animeCommandDefinition = {
           required: true
         }
       ]
-    }] : [])
+    }] : []),
+    {
+      name: 'help',
+      type: 1, // SUB_COMMAND type
+      description: 'Show help for all /anime commands'
+    }
   ]
 } as const
