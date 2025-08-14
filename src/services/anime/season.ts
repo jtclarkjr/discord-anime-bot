@@ -30,7 +30,8 @@ export async function getSeasonAnime(season: string, seasonYear: number, page: n
   const json = (await makeAniListRequest(query, variables)) as SeasonAnimeResponse
   
   if (json.errors) {
-    throw new Error(`AniList GraphQL error: ${json.errors[0]?.message}`)
+    const [error] = json.errors
+    throw new Error(`AniList GraphQL error: ${error?.message}`)
   }
 
   return json.data.Page
