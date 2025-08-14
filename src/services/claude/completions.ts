@@ -21,8 +21,8 @@ export async function findAnimeByDescriptionClaude(prompt: string): Promise<Anim
    ]`
 
   const msg = await anthropic.messages.create({
-    model: 'claude-3-opus-20240229',
-    max_tokens: 512,
+  model: 'claude-3-opus-20240229',
+  max_tokens: 2048, // Increased token limit for longer responses if needed
     messages: [
       { role: 'user', content: `${systemPrompt}\n\n${prompt}` }
     ]
