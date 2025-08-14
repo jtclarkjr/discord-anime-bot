@@ -194,6 +194,9 @@ func (b *Bot) ready(s *discordgo.Session, event *discordgo.Ready) {
 		commandOptions = append([]*discordgo.ApplicationCommandOption{findOption}, commandOptions...)
 	}
 
+	// Help command (from handler_help.go)
+	commandOptions = append(commandOptions, GetHelpCommandOption())
+
 	// Register the /anime command with subcommands
 	commands := []*discordgo.ApplicationCommand{
 		{
