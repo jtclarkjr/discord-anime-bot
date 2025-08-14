@@ -23,3 +23,5 @@ if (!OPENAI_API_KEY) {
 }
 
 export const IS_OPENAI_ENABLED = !!OPENAI_API_KEY
+
+export const storageFile = './data/notifications.json'

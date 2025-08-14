@@ -1,10 +1,10 @@
 import { Client, TextChannel } from 'discord.js'
 import { getAnimeById } from './next'
 import type { NotificationEntry } from '@/types/anilist'
+import { storageFile } from '@config/constants'
 
 let notifications: Map<string, NotificationEntry> = new Map()
 let client: Client | null = null
-const storageFile = './data/notifications.json'
 
 /**
  * Set the Discord client and load notifications on startup
