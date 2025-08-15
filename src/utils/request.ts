@@ -11,7 +11,7 @@ export const makeAniListRequest = async (query: string, variables: unknown) => {
   })
   
   if (!res.ok) {
-    throw new Error(`AniList API request failed with status: ${res.status}`)
+    throw new Error(`Request failed with status: ${res.status}`)
   }
   
   return res.json()
