@@ -4,7 +4,7 @@ A Discord bot written in Go that helps users find, search, and track anime using
 
 ## Features
 
-- **AI-Powered Anime Search**: Use natural language descriptions to find anime with GPT-5 _(requires OpenAI API key)_
+- **AI-Powered Anime Search**: Use natural language descriptions to find anime with GPT-5 _(requires OpenAI/ Claude API key)_
 - **Traditional Search**: Search anime by title using AniList API
 - **Episode Notifications**: Get notified when new anime episodes air
 - **Currently Releasing**: View currently airing anime with schedules
