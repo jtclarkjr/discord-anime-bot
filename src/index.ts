@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { Client, GatewayIntentBits } from 'discord.js'
 import { handleAnimeCommand, animeCommandDefinition } from '@/commands/index'
-import { DISCORD_TOKEN, IS_OPENAI_ENABLED } from '@/config/constants'
+import { DISCORD_TOKEN, IS_CLAUDE_ENABLED, IS_OPENAI_ENABLED } from '@/config/constants'
 import { setClient, cleanup } from '@/services/anime/notify'
 
 const client = new Client({
@@ -38,10 +38,12 @@ client.once('ready', async () => {
   await cleanup()
   }, 60 * 60 * 1000) // 1 hour
   
-  if (IS_OPENAI_ENABLED) {
+  if (IS_OPENAI_ENABLED && !IS_CLAUDE_ENABLED) {
     console.log('✅ OpenAI features enabled (find command available)')
+  } else if (!IS_OPENAI_ENABLED && IS_CLAUDE_ENABLED) {
+    console.log('✅ Claude features enabled (find command available)')
   } else {
-    console.log('⚠️ OpenAI features disabled (find command not available)')
+    console.log('⚠️ No AI features enabled (find command not available)')
   }
 
   // Register the /anime command with subcommands
