@@ -15,7 +15,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime watchlist remove <id>` - Remove an anime from your personal watchlist
 - `/anime release` - Show all currently releasing anime
 - `/anime season <season> [year]` - Get all anime from a specific season and year
-- `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI API key)_
+- `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI/ Claude API key)_
 
 ## Help Command
 
