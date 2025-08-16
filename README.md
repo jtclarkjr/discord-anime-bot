@@ -38,7 +38,11 @@ src/
 │   │   ├── season.ts       # Seasonal anime API service
 │   │   ├── find.ts         # AI-powered anime finder service
 │   │   ├── notify.ts       # Episode notification service
+│   │   ├── watchlist.ts    # Watchlist anime API service
 │   │   └── index.ts        # Anime services exports
+│   ├── claude/
+│   │   ├── claude.go       # Claude completions service
+│   │   └── index.ts        # Claude services exports
 │   ├── openai/
 │   │   ├── completions.ts  # OpenAI ChatGPT completion service
 │   │   └── index.ts        # OpenAI services exports
@@ -50,6 +54,9 @@ src/
 │   │   ├── release.ts      # Releasing anime command handler
 │   │   ├── season.ts       # Seasonal anime command handler
 │   │   ├── find.ts         # AI find anime command handler
+│   │   ├── notify.ts       # Episode notification command handler
+│   │   ├── watchlist.ts    # Watchlist command handler
+│   │   ├── help.ts         # Help command handler
 │   │   └── index.ts        # Command routing and definitions
 ├── utils/
 │   └── formatters.ts       # Utility functions for formatting dates and times

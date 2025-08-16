@@ -123,7 +123,9 @@ go/
 │   │   ├── handler_release.go      # Currently releasing anime
 │   │   ├── handler_season.go       # Seasonal anime listings
 │   │   ├── handler_next.go         # Next episode information
-│   │   └── handler_notify.go       # Episode notification system
+│   │   ├── handler_notify.go       # Episode notification system
+│   │   ├── handler_watchlist.go    # Watchlist management
+│   │   ├── handler_help.go         # Help command handler
 │   ├── config/                     # Configuration management
 │   │   └── config.go
 │   ├── services/                   # External service integrations
@@ -133,7 +135,10 @@ go/
 │   │   │   ├── release.go          # Currently releasing anime
 │   │   │   ├── season.go           # Seasonal anime data
 │   │   │   ├── next.go             # Next episode data
-│   │   │   └── notify.go           # Notification service
+│   │   │   ├── notify.go           # Notification service
+│   │   │   ├── watchlist.go        # Watchlist service
+│   │   └── claude/                 # Claude API integration
+│   │   │   └── claude.go           # Claude completions
 │   │   └── openai/                 # OpenAI API integration
 │   │       └── completions.go
 │   ├── types/                      # Type definitions
