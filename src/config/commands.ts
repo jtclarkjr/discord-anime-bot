@@ -69,6 +69,44 @@ export const animeCommandDefinition = {
       ]
     },
     {
+      name: 'watchlist',
+      type: 2, // SUB_COMMAND_GROUP type
+      description: 'Personal anime watchlist commands',
+      options: [
+        {
+          name: 'add',
+          type: 1, // SUB_COMMAND type
+          description: 'Add an anime to your watchlist',
+          options: [
+            {
+              name: 'id',
+              type: 4, // INTEGER type
+              description: 'AniList ID of the anime',
+              required: true
+            }
+          ]
+        },
+        {
+          name: 'list',
+          type: 1, // SUB_COMMAND type
+          description: 'Show your anime watchlist'
+        },
+        {
+          name: 'remove',
+          type: 1, // SUB_COMMAND type
+          description: 'Remove an anime from your watchlist',
+          options: [
+            {
+              name: 'id',
+              type: 4, // INTEGER type
+              description: 'AniList ID of the anime',
+              required: true
+            }
+          ]
+        }
+      ]
+    },
+    {
       name: 'release',
       type: 1, // SUB_COMMAND type
       description: 'Show all currently releasing anime'

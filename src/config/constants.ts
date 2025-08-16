@@ -30,3 +30,4 @@ export const IS_CLAUDE_ENABLED = !!CLAUDE_API_KEY
 export const IS_AI_ENABLED = !!OPENAI_API_KEY || !!CLAUDE_API_KEY
 
 export const storageFile = './data/notifications.json'
+export const watchlistFile = './data/watchlists.json'

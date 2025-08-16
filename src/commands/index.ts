@@ -7,6 +7,7 @@ import { handleFindCommand } from './anime/find'
 import { handleNotifyCommand } from './anime/notify'
 import { IS_OPENAI_ENABLED } from '@/config/constants'
 import { handleHelpCommand } from './anime/help'
+import { handleWatchlistCommand } from './anime/watchlist'
 export { animeCommandDefinition } from '@/config/commands'
 
 export async function handleAnimeCommand(interaction: ChatInputCommandInteraction) {
@@ -22,6 +23,9 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
       break
     case 'notify':
       await handleNotifyCommand(interaction)
+      break
+    case 'watchlist':
+      await handleWatchlistCommand(interaction)
       break
     case 'release':
       await handleReleaseCommand(interaction)
