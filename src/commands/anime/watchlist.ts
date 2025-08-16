@@ -31,7 +31,10 @@ async function handleWatchlistAddCommand(interaction: ChatInputCommandInteractio
   try {
     const result = await addToWatchlist(interaction.user.id, animeId)
     if (result.success) {
-      await interaction.editReply(`✅ Added anime ID ${animeId} to your watchlist.`)
+      // Fetch anime name for confirmation
+      const anime = await (await import('@/services/anime/next')).getAnimeById(animeId)
+      const title = anime ? (anime.title.english || anime.title.romaji) : `Anime ID ${animeId}`
+      await interaction.editReply(`✅ Added **${title}** (ID: ${animeId}) to your watchlist.`)
     } else {
       await interaction.editReply(`❌ ${result.message}`)
     }

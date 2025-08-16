@@ -35,27 +35,27 @@ func (b *Bot) handleWatchlistAddCommand(s *discordgo.Session, i *discordgo.Inter
 		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 		return
 	}
-	   animeID := int(options[0].IntValue())
-	   userID := i.Member.User.ID
-	   msg, err := anilist.AddToWatchlist(userID, animeID)
-	   if err == nil && msg == "Anime added to your watchlist." {
-		   // Fetch anime name for confirmation
-		   anime, err := anilist.GetAnimeByID(animeID)
-		   var title string
-		   if err == nil && anime != nil {
-			   if anime.Title.English != nil && *anime.Title.English != "" {
-				   title = *anime.Title.English
-			   } else {
-				   title = anime.Title.Romaji
-			   }
-		   } else {
-			   title = fmt.Sprintf("Anime ID %d", animeID)
-		   }
-		   msg = fmt.Sprintf("✅ Added **%s** (ID: %d) to your watchlist.", title, animeID)
-	   } else if err != nil {
-		   msg = "❌ Failed to add to watchlist"
-	   }
-	   s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+	animeID := int(options[0].IntValue())
+	userID := i.Member.User.ID
+	msg, err := anilist.AddToWatchlist(userID, animeID)
+	if err == nil && msg == "Anime added to your watchlist." {
+		// Fetch anime name for confirmation
+		anime, err := anilist.GetAnimeByID(animeID)
+		var title string
+		if err == nil && anime != nil {
+			if anime.Title.English != nil && *anime.Title.English != "" {
+				title = *anime.Title.English
+			} else {
+				title = anime.Title.Romaji
+			}
+		} else {
+			title = fmt.Sprintf("Anime ID %d", animeID)
+		}
+		msg = fmt.Sprintf("✅ Added **%s** (ID: %d) to your watchlist.", title, animeID)
+	} else if err != nil {
+		msg = "❌ Failed to add to watchlist"
+	}
+	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 }
 
 func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
