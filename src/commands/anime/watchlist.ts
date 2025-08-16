@@ -70,7 +70,10 @@ async function handleWatchlistRemoveCommand(interaction: ChatInputCommandInterac
   try {
     const result = await removeFromWatchlist(interaction.user.id, animeId)
     if (result.success) {
-      await interaction.editReply(`✅ Removed anime ID ${animeId} from your watchlist.`)
+      // Fetch anime name for confirmation
+      const anime = await (await import('@/services/anime/next')).getAnimeById(animeId)
+      const title = anime ? (anime.title.english || anime.title.romaji) : `Anime ID ${animeId}`
+      await interaction.editReply(`✅ Removed **${title}** (ID: ${animeId}) from your watchlist.`)
     } else {
       await interaction.editReply(`❌ ${result.message}`)
     }

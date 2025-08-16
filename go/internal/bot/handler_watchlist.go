@@ -89,7 +89,21 @@ func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.In
 	animeID := int(options[0].IntValue())
 	userID := i.Member.User.ID
 	msg, err := anilist.RemoveFromWatchlist(userID, animeID)
-	if err != nil {
+	if err == nil && msg == "Anime removed from your watchlist." {
+		// Fetch anime name for confirmation
+		anime, err := anilist.GetAnimeByID(animeID)
+		var title string
+		if err == nil && anime != nil {
+			if anime.Title.English != nil && *anime.Title.English != "" {
+				title = *anime.Title.English
+			} else {
+				title = anime.Title.Romaji
+			}
+		} else {
+			title = fmt.Sprintf("Anime ID %d", animeID)
+		}
+		msg = fmt.Sprintf("✅ Removed **%s** (ID: %d) from your watchlist.", title, animeID)
+	} else if err != nil {
 		msg = "❌ Failed to remove from watchlist"
 	}
 	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
