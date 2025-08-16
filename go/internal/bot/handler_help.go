@@ -28,6 +28,9 @@ func (b *Bot) handleHelpCommand(s *discordgo.Session, i *discordgo.InteractionCr
 		"**/anime notify add <id>**: Set notification for next episode",
 		"**/anime notify list**: List your active episode notifications",
 		"**/anime notify cancel <id>**: Cancel notification for an anime",
+		"**/anime watchlist add <id>**: Add an anime to your personal watchlist",
+		"**/anime watchlist list**: Show your personal anime watchlist (only visible to you)",
+		"**/anime watchlist remove <id>**: Remove an anime from your personal watchlist",
 	}
 	if b.config.IsOpenAIEnabled {
 		helpLines = append(helpLines, "**/anime find <prompt>**: Find anime by description using AI")

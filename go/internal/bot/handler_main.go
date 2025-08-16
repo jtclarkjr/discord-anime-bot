@@ -46,6 +46,8 @@ func (b *Bot) interactionCreate(s *discordgo.Session, i *discordgo.InteractionCr
 		b.handleNextCommand(s, i, subcommand.Options)
 	case "notify":
 		b.handleNotifyCommand(s, i, subcommand.Options)
+	case "watchlist":
+		b.handleWatchlistCommand(s, i, subcommand.Options)
 	case "help":
 		b.handleHelpCommand(s, i)
 	default:
