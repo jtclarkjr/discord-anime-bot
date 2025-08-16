@@ -175,14 +175,6 @@ The notification system provides:
 - **User Management**: Per-user notification tracking
 - **Memory Efficient**: Minimal memory footprint with cleanup on notification fire
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
 ## License
 
 MIT License - see the original project's LICENSE file for details.
