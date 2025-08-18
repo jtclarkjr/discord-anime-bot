@@ -3,11 +3,15 @@ import { watchlistFile } from '@config/constants'
 async function readWatchlists(): Promise<Record<string, number[]>> {
   try {
     const file = Bun.file(watchlistFile)
+    // Want the json to have {} when empty
     if (!(await file.exists())) return {}
     const raw = await file.text()
     return JSON.parse(raw)
-  } catch {
-    return {}
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error('Failed to read watchlists: ' + err.message)
+    }
+    throw new Error('Failed to read watchlists')
   }
 }
 
