@@ -5,7 +5,11 @@ import { DISCORD_TOKEN, IS_CLAUDE_ENABLED, IS_OPENAI_ENABLED } from '@/config/co
 import { setClient, cleanup } from '@/services/anime/notify'
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 })
 
 client.on('interactionCreate', async (interaction) => {
@@ -16,8 +20,11 @@ client.on('interactionCreate', async (interaction) => {
       await handleAnimeCommand(interaction)
     } catch (err) {
       console.error('Error handling anime command:', err)
-      const reply = { content: '❌ An error occurred while processing your command.', ephemeral: true }
-      
+      const reply = {
+        content: '❌ An error occurred while processing your command.',
+        ephemeral: true
+      }
+
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply(reply)
       } else {
@@ -29,15 +36,18 @@ client.on('interactionCreate', async (interaction) => {
 
 client.once('ready', async () => {
   console.log(`Logged in as ${client.user?.tag}!`)
-  
+
   // Initialize notification service
   setClient(client)
-  
+
   // Clean up expired notifications every hour
-  setInterval(async () => {
-  await cleanup()
-  }, 60 * 60 * 1000) // 1 hour
-  
+  setInterval(
+    async () => {
+      await cleanup()
+    },
+    60 * 60 * 1000
+  ) // 1 hour
+
   if (IS_OPENAI_ENABLED && !IS_CLAUDE_ENABLED) {
     console.log('✅ OpenAI features enabled (find command available)')
   } else if (!IS_OPENAI_ENABLED && IS_CLAUDE_ENABLED) {

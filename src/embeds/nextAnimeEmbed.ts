@@ -1,21 +1,24 @@
 import { EmbedBuilder } from 'discord.js'
 import type { AnimeDetails } from '@/types/anilist'
 
-export function createNextAnimeEmbed(anime: AnimeDetails, options: {
-  isFinished: boolean
-  nextAiringEpisode?: {
-    airingAt: number
-    timeUntilAiring?: number
-    episode: number
-    formattedAirDate: string
-    timeString: string
+export function createNextAnimeEmbed(
+  anime: AnimeDetails,
+  options: {
+    isFinished: boolean
+    nextAiringEpisode?: {
+      airingAt: number
+      timeUntilAiring?: number
+      episode: number
+      formattedAirDate: string
+      timeString: string
+    }
   }
-}): EmbedBuilder {
+): EmbedBuilder {
   const embed = new EmbedBuilder()
     .setTitle(anime.title.english || anime.title.romaji)
     .setURL(anime.siteUrl)
     .setThumbnail(anime.coverImage.large)
-    .setColor(0x02A9FF)
+    .setColor(0x02a9ff)
 
   if (options.isFinished) {
     embed.setDescription('This anime has finished airing.')
@@ -25,7 +28,9 @@ export function createNextAnimeEmbed(anime: AnimeDetails, options: {
       { name: 'Total Episodes', value: anime.episodes?.toString() || 'Unknown', inline: true }
     )
   } else if (options.nextAiringEpisode) {
-    embed.setDescription(`Next episode airs in ${options.nextAiringEpisode.timeString} (${options.nextAiringEpisode.formattedAirDate})`)
+    embed.setDescription(
+      `Next episode airs in ${options.nextAiringEpisode.timeString} (${options.nextAiringEpisode.formattedAirDate})`
+    )
     embed.addFields(
       { name: 'Status', value: anime.status, inline: true },
       { name: 'Format', value: anime.format, inline: true },

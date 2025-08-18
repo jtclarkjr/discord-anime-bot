@@ -1,4 +1,3 @@
-
 import { EmbedBuilder } from 'discord.js'
 import type { AnimeMedia, AnimeMatch } from '@/types/anilist'
 
@@ -16,6 +15,6 @@ export function createFindAnimeEmbed(anime: AnimeMedia, bestMatch: AnimeMatch): 
       { name: 'AniList ID', value: anime.id.toString(), inline: true },
       { name: 'AI Confidence', value: `${Math.round(bestMatch.confidence * 100)}%`, inline: true }
     )
-    .setColor(0x00FF00)
+    .setColor(0x00ff00)
     .setFooter({ text: 'Powered by GPT-5 + AniList' })
 }

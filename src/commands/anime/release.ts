@@ -8,27 +8,30 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
 
   try {
     const releasingAnime = await getReleasingAnime()
-    
+
     if (releasingAnime.media.length === 0) {
       await interaction.editReply('❌ No releasing anime found.')
       return
     }
 
     // Create a list of currently releasing anime
-    const animeList = releasingAnime.media.slice(0, 15).map(anime => {
-      const title = anime.title.english || anime.title.romaji
-      let nextEpisodeInfo = ''
-      
-      if (anime.nextAiringEpisode) {
-        const airingDate = new Date(anime.nextAiringEpisode.airingAt * 1000)
-        const formattedTime = formatCompactDateTime(airingDate)
-        nextEpisodeInfo = ` - Ep ${anime.nextAiringEpisode.episode} on ${formattedTime}`
-      } else {
-        nextEpisodeInfo = ' - No schedule'
-      }
-      
-      return `**${title}** (ID: ${anime.id})${nextEpisodeInfo}`
-    }).join('\n')
+    const animeList = releasingAnime.media
+      .slice(0, 15)
+      .map((anime) => {
+        const title = anime.title.english || anime.title.romaji
+        let nextEpisodeInfo = ''
+
+        if (anime.nextAiringEpisode) {
+          const airingDate = new Date(anime.nextAiringEpisode.airingAt * 1000)
+          const formattedTime = formatCompactDateTime(airingDate)
+          nextEpisodeInfo = ` - Ep ${anime.nextAiringEpisode.episode} on ${formattedTime}`
+        } else {
+          nextEpisodeInfo = ' - No schedule'
+        }
+
+        return `**${title}** (ID: ${anime.id})${nextEpisodeInfo}`
+      })
+      .join('\n')
 
     const embed = createReleaseAnimeEmbed(
       animeList,

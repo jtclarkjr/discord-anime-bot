@@ -18,7 +18,7 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
     }
 
     const seasonAnime = await getSeasonAnime(season, year)
-    
+
     if (seasonAnime.media.length === 0) {
       await interaction.editReply(`❌ No anime found for ${season} ${year}.`)
       return
@@ -28,7 +28,7 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
       season,
       year,
       animeMedia: seasonAnime.media,
-      getStatusEmoji,
+      getStatusEmoji
     })
 
     // Discord allows up to 10 embeds per message
@@ -37,7 +37,7 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
     } else {
       // Send first 10 embeds initially
       await interaction.editReply({ embeds: embeds.slice(0, 10) })
-      
+
       // Send remaining embeds as follow-up messages
       for (let i = 10; i < embeds.length; i += 10) {
         const embedSlice = embeds.slice(i, i + 10)

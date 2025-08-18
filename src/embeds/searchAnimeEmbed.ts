@@ -13,5 +13,5 @@ export function createSearchAnimeEmbed(anime: AnimeMedia): EmbedBuilder {
       { name: 'Status', value: anime.status, inline: true },
       { name: 'AniList ID', value: anime.id.toString(), inline: true }
     )
-    .setColor(0x02A9FF)
+    .setColor(0x02a9ff)
 }

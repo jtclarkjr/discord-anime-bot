@@ -136,19 +136,23 @@ export const animeCommandDefinition = {
         }
       ]
     },
-  ...(IS_OPENAI_ENABLED ? [{
-      name: 'find',
-      type: 1, // SUB_COMMAND type
-      description: 'Find anime using AI based on description',
-      options: [
-        {
-          name: 'prompt',
-          type: 3, // STRING type
-          description: 'Describe the anime you are looking for',
-          required: true
-        }
-      ]
-    }] : []),
+    ...(IS_OPENAI_ENABLED
+      ? [
+          {
+            name: 'find',
+            type: 1, // SUB_COMMAND type
+            description: 'Find anime using AI based on description',
+            options: [
+              {
+                name: 'prompt',
+                type: 3, // STRING type
+                description: 'Describe the anime you are looking for',
+                required: true
+              }
+            ]
+          }
+        ]
+      : []),
     {
       name: 'help',
       type: 1, // SUB_COMMAND type

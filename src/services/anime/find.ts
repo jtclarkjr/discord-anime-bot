@@ -1,7 +1,12 @@
 import { searchAnime } from './search'
 import { findAnimeByDescription as findAnimeByDescriptionOpenAI } from '@/services/openai/completions'
 import { findAnimeByDescriptionClaude } from '@/services/claude/completions'
-import { IS_OPENAI_ENABLED, IS_CLAUDE_ENABLED, OPENAI_API_KEY, CLAUDE_API_KEY } from '@/config/constants'
+import {
+  IS_OPENAI_ENABLED,
+  IS_CLAUDE_ENABLED,
+  OPENAI_API_KEY,
+  CLAUDE_API_KEY
+} from '@/config/constants'
 import type { AnimeRecommendation } from '@/types/openai'
 import type { AnimeMatch } from '@/types/anilist'
 
@@ -10,12 +15,14 @@ import type { AnimeMatch } from '@/types/anilist'
  */
 export async function findAnimeWithDetails(description: string): Promise<AnimeMatch[]> {
   if (!IS_OPENAI_ENABLED && !IS_CLAUDE_ENABLED) {
-    throw new Error('AI is not configured. Please set OPENAI_API_KEY or CLAUDE_API_KEY environment variable to use AI-powered anime search.')
+    throw new Error(
+      'AI is not configured. Please set OPENAI_API_KEY or CLAUDE_API_KEY environment variable to use AI-powered anime search.'
+    )
   }
 
   try {
     // Prefer OpenAI if both keys are present
-  let recommendations: AnimeRecommendation[] = []
+    let recommendations: AnimeRecommendation[] = []
     if (IS_OPENAI_ENABLED && OPENAI_API_KEY) {
       recommendations = await findAnimeByDescriptionOpenAI(description)
     } else if (IS_CLAUDE_ENABLED && CLAUDE_API_KEY) {
@@ -45,7 +52,6 @@ export async function findAnimeWithDetails(description: string): Promise<AnimeMa
 
     // Sort by confidence score
     return matches.sort((a, b) => b.confidence - a.confidence)
-
   } catch (error) {
     console.error('Error finding anime with details:', error)
     throw new Error('Failed to find anime based on description')

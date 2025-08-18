@@ -14,7 +14,7 @@ export async function handleNextCommand(interaction: ChatInputCommandInteraction
 
   try {
     const anime = await getAnimeById(animeId)
-    
+
     if (!anime) {
       await interaction.editReply(`❌ No anime found with ID ${animeId}.`)
       return
@@ -32,7 +32,7 @@ export async function handleNextCommand(interaction: ChatInputCommandInteraction
         timeString: formatCountdown(anime.nextAiringEpisode.timeUntilAiring || 0)
       }
     }
-    
+
     const embed = createNextAnimeEmbed(anime, { isFinished, nextAiringEpisode })
 
     await interaction.editReply({ embeds: [embed] })

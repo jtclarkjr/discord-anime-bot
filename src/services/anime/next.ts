@@ -23,7 +23,7 @@ export async function getAnimeById(animeId: number): Promise<AnimeDetails | null
       }
     }
   `
-  
+
   const variables = {
     id: animeId
   }

@@ -13,7 +13,7 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
 
   try {
     const searchResults = await searchAnime(searchQuery)
-    
+
     if (searchResults.media.length === 0) {
       await interaction.editReply(`❌ No anime found for "${searchQuery}".`)
       return
@@ -25,7 +25,10 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
 
     let responseText = `Found ${searchResults.pageInfo.total} result(s) for "${searchQuery}"`
     if (searchResults.media.length > 1) {
-      responseText += `\n\nShowing top result. Other matches:\n${searchResults.media.slice(1, 5).map(a => `• ${a.title.english || a.title.romaji}`).join('\n')}`
+      responseText += `\n\nShowing top result. Other matches:\n${searchResults.media
+        .slice(1, 5)
+        .map((a) => `• ${a.title.english || a.title.romaji}`)
+        .join('\n')}`
     }
 
     await interaction.editReply({ content: responseText, embeds: [embed] })

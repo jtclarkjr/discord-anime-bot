@@ -7,7 +7,8 @@
   "scripts": {
     "start": "bun src/index.ts",
     "dev": "bun --env-file=.env src/index.ts",
-    "lint": "oxlint ./src --fix"
+    "lint": "oxlint ./src --fix",
+    "format": "prettier --write ./src"
   },
   "author": "jtclarkjr",
   "license": "MIT",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@types/bun": "^1.2.19",
-    "oxlint": "^1.11.1"
+    "oxlint": "^1.11.1",
+    "prettier": "^3.6.2"
   }
 }

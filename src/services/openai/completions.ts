@@ -27,18 +27,18 @@ Respond with only valid JSON:
 ]`
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-5",
+      model: 'gpt-5',
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: prompt
         }
-      ],
-    //   max_completion_tokens: 1000
+      ]
+      //   max_completion_tokens: 1000
     })
 
     // console.log('OpenAI completion:', JSON.stringify(completion, null, 2))
-    
+
     const response = completion.choices[0]?.message?.content
     if (!response) {
       console.error('No response content. Full completion:', completion)
@@ -49,16 +49,15 @@ Respond with only valid JSON:
 
     // Parse the JSON response
     const recommendations = JSON.parse(response) as AnimeRecommendation[]
-    
+
     // Validate the response structure
     if (!Array.isArray(recommendations)) {
       throw new Error('Invalid response format')
     }
 
-    return recommendations.filter(rec => 
-      rec.title && rec.reason && typeof rec.confidence === 'number'
+    return recommendations.filter(
+      (rec) => rec.title && rec.reason && typeof rec.confidence === 'number'
     )
-
   } catch (error) {
     console.error('Error finding anime by description:', error)
     throw new Error('Failed to find anime recommendations')

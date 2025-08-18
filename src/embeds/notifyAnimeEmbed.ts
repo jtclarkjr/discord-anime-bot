@@ -4,7 +4,7 @@ export function createNotifySuccessEmbed(message: string, airingDate?: Date): Em
   const embed = new EmbedBuilder()
     .setTitle('✅ Notification Set!')
     .setDescription(message)
-    .setColor(0x00FF00)
+    .setColor(0x00ff00)
 
   if (airingDate) {
     embed.addFields({
@@ -20,19 +20,19 @@ export function createNotifyErrorEmbed(message: string): EmbedBuilder {
   return new EmbedBuilder()
     .setTitle('❌ Notification Error')
     .setDescription(message)
-    .setColor(0xFF0000)
+    .setColor(0xff0000)
 }
 
 export function createNotifyListEmbed(list: string): EmbedBuilder {
   return new EmbedBuilder()
     .setTitle('🔔 Your Anime Notifications')
     .setDescription(list)
-    .setColor(0x02A9FF)
+    .setColor(0x02a9ff)
 }
 
 export function createNotifyCancelEmbed(message: string): EmbedBuilder {
   return new EmbedBuilder()
     .setTitle('🚫 Notification Cancelled')
     .setDescription(message)
-    .setColor(0xFFA500)
+    .setColor(0xffa500)
 }

@@ -5,12 +5,12 @@ export function formatCountdown(timeUntil: number): string {
   const days = Math.floor(timeUntil / (24 * 60 * 60))
   const hours = Math.floor((timeUntil % (24 * 60 * 60)) / (60 * 60))
   const minutes = Math.floor((timeUntil % (60 * 60)) / 60)
-  
+
   let timeString = ''
   if (days > 0) timeString += `${days} day${days > 1 ? 's' : ''} `
   if (hours > 0) timeString += `${hours} hour${hours > 1 ? 's' : ''} `
   if (minutes > 0) timeString += `${minutes} minute${minutes > 1 ? 's' : ''}`
-  
+
   return timeString.trim()
 }
 

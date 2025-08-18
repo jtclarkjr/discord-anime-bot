@@ -53,7 +53,7 @@ async function loadNotifications() {
  */
 async function saveNotifications() {
   try {
-    const persistedNotifications = Array.from(notifications.values()).map(entry => ({
+    const persistedNotifications = Array.from(notifications.values()).map((entry) => ({
       animeId: entry.animeId,
       channelId: entry.channelId,
       userId: entry.userId,
@@ -71,19 +71,26 @@ async function saveNotifications() {
 /**
  * Add a notification for an anime episode
  */
-export async function addNotification(animeId: number, channelId: string, userId: string): Promise<{ success: boolean; message: string; airingDate?: Date }> {
+export async function addNotification(
+  animeId: number,
+  channelId: string,
+  userId: string
+): Promise<{ success: boolean; message: string; airingDate?: Date }> {
   if (!client) {
     return { success: false, message: 'Bot client not initialized' }
   }
   try {
     const anime = await getAnimeById(animeId)
-    
+
     if (!anime) {
       return { success: false, message: `No anime found with ID ${animeId}` }
     }
 
     if (!anime.nextAiringEpisode) {
-      return { success: false, message: `No upcoming episodes scheduled for ${anime.title.english || anime.title.romaji}` }
+      return {
+        success: false,
+        message: `No upcoming episodes scheduled for ${anime.title.english || anime.title.romaji}`
+      }
     }
 
     if (anime.status === 'FINISHED') {
@@ -96,18 +103,21 @@ export async function addNotification(animeId: number, channelId: string, userId
 
     const airingAt = anime.nextAiringEpisode.airingAt * 1000 // Convert to milliseconds
     const now = Date.now()
-    
+
     if (airingAt <= now) {
       return { success: false, message: 'This episode has already aired' }
     }
 
     const notificationKey = `${animeId}-${channelId}-${userId}`
-    
+
     // Check if notification already exists
     if (notifications.has(notificationKey)) {
-      return { success: false, message: `You already have a notification set for ${anime.title.english || anime.title.romaji}` }
+      return {
+        success: false,
+        message: `You already have a notification set for ${anime.title.english || anime.title.romaji}`
+      }
     }
-    
+
     // Remove any other notifications for this anime by this user (in case they exist in other channels)
     const keysToRemove: string[] = []
     for (const [key, entry] of notifications.entries()) {
@@ -115,7 +125,7 @@ export async function addNotification(animeId: number, channelId: string, userId
         keysToRemove.push(key)
       }
     }
-    
+
     // Remove the found notifications (without saving each time to avoid race condition)
     for (const key of keysToRemove) {
       removeNotificationInternal(key)
@@ -142,8 +152,8 @@ export async function addNotification(animeId: number, channelId: string, userId
     // Save to persistent storage
     await saveNotifications()
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       message: `Notification set for ${anime.title.english || anime.title.romaji} Episode ${anime.nextAiringEpisode.episode}`,
       airingDate
     }
@@ -178,7 +188,11 @@ export async function removeNotification(notificationKey: string): Promise<boole
 /**
  * Remove notifications for a specific user and anime
  */
-export async function removeUserNotification(animeId: number, channelId: string, userId: string): Promise<boolean> {
+export async function removeUserNotification(
+  animeId: number,
+  channelId: string,
+  userId: string
+): Promise<boolean> {
   const notificationKey = `${animeId}-${channelId}-${userId}`
   return await removeNotification(notificationKey)
 }
@@ -189,7 +203,7 @@ export async function removeUserNotification(animeId: number, channelId: string,
 async function sendNotification(entry: NotificationEntry) {
   if (!client) return
   try {
-    const channel = await client.channels.fetch(entry.channelId) as TextChannel
+    const channel = (await client.channels.fetch(entry.channelId)) as TextChannel
     if (!channel) return
     const anime = await getAnimeById(entry.animeId)
     if (!anime) return
@@ -209,8 +223,8 @@ async function sendNotification(entry: NotificationEntry) {
  * Get all active notifications for a user in a specific channel
  */
 export function getUserNotifications(userId: string, channelId?: string): NotificationEntry[] {
-  return Array.from(notifications.values()).filter(entry => 
-    entry.userId === userId && (!channelId || entry.channelId === channelId)
+  return Array.from(notifications.values()).filter(
+    (entry) => entry.userId === userId && (!channelId || entry.channelId === channelId)
   )
 }
 

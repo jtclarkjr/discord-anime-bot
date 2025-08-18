@@ -4,7 +4,12 @@ import { makeAniListRequest } from '@/utils/request'
 /**
  * Get anime for a specific season and year
  */
-export async function getSeasonAnime(season: string, seasonYear: number, page: number = 1, perPage: number = 50) {
+export async function getSeasonAnime(
+  season: string,
+  seasonYear: number,
+  page: number = 1,
+  perPage: number = 50
+) {
   const query = `
     query SeasonAnime($season: MediaSeason, $seasonYear: Int, $type: MediaType, $page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {
@@ -18,7 +23,7 @@ export async function getSeasonAnime(season: string, seasonYear: number, page: n
       }
     }
   `
-  
+
   const variables = {
     season: season.toUpperCase(),
     seasonYear,
@@ -28,7 +33,7 @@ export async function getSeasonAnime(season: string, seasonYear: number, page: n
   }
 
   const json = (await makeAniListRequest(query, variables)) as SeasonAnimeResponse
-  
+
   if (json.errors) {
     const [error] = json.errors
     throw new Error(`AniList GraphQL error: ${error?.message}`)

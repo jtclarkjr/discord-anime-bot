@@ -1,12 +1,16 @@
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 import { getAnimeById } from '@/services/anime/next'
 import { formatAirDate } from '@/utils/formatters'
-import { addNotification, getUserNotifications, removeUserNotification } from '@/services/anime/notify'
+import {
+  addNotification,
+  getUserNotifications,
+  removeUserNotification
+} from '@/services/anime/notify'
 import { createNotifyListEmbed, createNotifyCancelEmbed } from '@/embeds/notifyAnimeEmbed'
 
 export async function handleNotifyCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
-  
+
   switch (subcommand) {
     case 'add':
       await handleNotifyAddCommand(interaction)
@@ -35,11 +39,7 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
 
   try {
     // console.log(`🔔 [NotifyAdd] Calling notificationService.addNotification`)
-    const result = await addNotification(
-      animeId,
-      interaction.channelId,
-      interaction.user.id
-    )
+    const result = await addNotification(animeId, interaction.channelId, interaction.user.id)
 
     // console.log(`🔔 [NotifyAdd] Result:`, result)
 
@@ -47,8 +47,8 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
       const embed = new EmbedBuilder()
         .setTitle('✅ Notification Set!')
         .setDescription(result.message)
-        .setColor(0x00FF00)
-        
+        .setColor(0x00ff00)
+
       if (result.airingDate) {
         embed.addFields({
           name: 'Airing Date',
@@ -57,14 +57,14 @@ async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) 
         })
       }
 
-  await interaction.editReply({ embeds: [embed] })
+      await interaction.editReply({ embeds: [embed] })
     } else {
-  await interaction.editReply(`❌ ${result.message}`)
+      await interaction.editReply(`❌ ${result.message}`)
     }
   } catch (error) {
     console.error('🔔 [NotifyAdd] Error in notify add command:', error)
     try {
-  await interaction.editReply('❌ An error occurred while setting up the notification.')
+      await interaction.editReply('❌ An error occurred while setting up the notification.')
     } catch (replyError) {
       console.error('🔔 [NotifyAdd] Failed to send error reply:', replyError)
     }
@@ -75,10 +75,10 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
   await interaction.deferReply({ flags: 1 << 6 })
 
   try {
-  const notifications = getUserNotifications(interaction.user.id)
-    
+    const notifications = getUserNotifications(interaction.user.id)
+
     if (notifications.length === 0) {
-  await interaction.editReply('📋 You have no active episode notifications.')
+      await interaction.editReply('📋 You have no active episode notifications.')
       return
     }
 
@@ -93,10 +93,10 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
       }
     }
     const embed = createNotifyListEmbed(description)
-  await interaction.editReply({ embeds: [embed] })
+    await interaction.editReply({ embeds: [embed] })
   } catch (error) {
     console.error('Error in notify list command:', error)
-  await interaction.editReply('❌ An error occurred while fetching your notifications.')
+    await interaction.editReply('❌ An error occurred while fetching your notifications.')
   }
 }
 
@@ -105,7 +105,7 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
 
   const animeId = interaction.options.getInteger('id')
   if (!animeId) {
-  await interaction.editReply('❌ Please provide a valid anime ID.')
+    await interaction.editReply('❌ Please provide a valid anime ID.')
     return
   }
 
@@ -118,16 +118,16 @@ async function handleNotifyCancelCommand(interaction: ChatInputCommandInteractio
 
     if (removed) {
       const anime = await getAnimeById(animeId)
-      const title = anime ? (anime.title.english || anime.title.romaji) : `Anime ID ${animeId}`
+      const title = anime ? anime.title.english || anime.title.romaji : `Anime ID ${animeId}`
       const embed = createNotifyCancelEmbed(`Notification canceled for **${title}**`)
-  await interaction.editReply({ embeds: [embed] })
+      await interaction.editReply({ embeds: [embed] })
     } else {
-  await interaction.editReply('❌ No active notification found for this anime.')
+      await interaction.editReply('❌ No active notification found for this anime.')
     }
   } catch (error) {
     console.error('Error in notify cancel command:', error)
     try {
-  await interaction.editReply('❌ An error occurred while canceling the notification.')
+      await interaction.editReply('❌ An error occurred while canceling the notification.')
     } catch (replyError) {
       console.error('Failed to send error reply:', replyError)
     }

@@ -35,7 +35,9 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
       break
     case 'find':
       if (!IS_OPENAI_ENABLED) {
-        await interaction.reply('❌ The find command is disabled because OpenAI API key is not configured.')
+        await interaction.reply(
+          '❌ The find command is disabled because OpenAI API key is not configured.'
+        )
         return
       }
       await handleFindCommand(interaction)

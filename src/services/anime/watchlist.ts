@@ -1,5 +1,3 @@
-
-
 import { watchlistFile } from '@config/constants'
 
 async function readWatchlists(): Promise<Record<string, number[]>> {
@@ -22,7 +20,10 @@ export async function getUserWatchlist(userId: string): Promise<number[]> {
   return lists[userId] || []
 }
 
-export async function addToWatchlist(userId: string, animeId: number): Promise<{ success: boolean; message: string }> {
+export async function addToWatchlist(
+  userId: string,
+  animeId: number
+): Promise<{ success: boolean; message: string }> {
   const lists = await readWatchlists()
   if (!lists[userId]) lists[userId] = []
   if (lists[userId].includes(animeId)) {
@@ -33,12 +34,15 @@ export async function addToWatchlist(userId: string, animeId: number): Promise<{
   return { success: true, message: 'Anime added to your watchlist.' }
 }
 
-export async function removeFromWatchlist(userId: string, animeId: number): Promise<{ success: boolean; message: string }> {
+export async function removeFromWatchlist(
+  userId: string,
+  animeId: number
+): Promise<{ success: boolean; message: string }> {
   const lists = await readWatchlists()
   if (!lists[userId] || !lists[userId].includes(animeId)) {
     return { success: false, message: 'Anime not found in your watchlist.' }
   }
-  lists[userId] = lists[userId].filter(id => id !== animeId)
+  lists[userId] = lists[userId].filter((id) => id !== animeId)
   await writeWatchlists(lists)
   return { success: true, message: 'Anime removed from your watchlist.' }
 }

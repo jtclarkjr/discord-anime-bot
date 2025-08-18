@@ -1,4 +1,4 @@
-import { ANILIST_API } from "@config/constants"
+import { ANILIST_API } from '@config/constants'
 
 /**
  * Helper function to make GraphQL requests to AniList API
@@ -9,10 +9,10 @@ export const makeAniListRequest = async (query: string, variables: unknown) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query, variables })
   })
-  
+
   if (!res.ok) {
     throw new Error(`Request failed with status: ${res.status}`)
   }
-  
+
   return res.json()
 }

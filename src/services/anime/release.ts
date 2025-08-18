@@ -20,7 +20,7 @@ export async function getReleasingAnime(page: number = 1, perPage: number = 25) 
       }
     }
   `
-  
+
   const variables = {
     page,
     perPage

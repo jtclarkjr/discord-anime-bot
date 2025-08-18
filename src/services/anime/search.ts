@@ -1,7 +1,6 @@
 import type { AnimeSearchResponse } from '@/types/anilist'
 import { makeAniListRequest } from '@utils/request'
 
-
 /**
  * Search for anime using AniList API
  * Supports both text search and ID lookup
@@ -14,7 +13,7 @@ export async function searchAnime(searchQuery: string, page: number = 1, perPage
   // Check if the search query is a numeric ID
   const numericId = parseInt(searchQuery.trim())
   const isNumericSearch = !isNaN(numericId) && numericId.toString() === searchQuery.trim()
-  
+
   if (isNumericSearch) {
     // Search by ID - return single result in page format
     return searchAnimeById(numericId)
@@ -40,10 +39,10 @@ async function searchAnimeById(animeId: number) {
       }
     }
   `
-  
+
   const variables = { id: animeId }
   const json = await makeAniListRequest(query, variables)
-  
+
   // Return in the same format as search results
   if (json.data?.Media) {
     return {
@@ -88,7 +87,7 @@ async function searchAnimeByText(searchQuery: string, page: number, perPage: num
       }
     }
   `
-  
+
   const variables = {
     q: searchQuery,
     page,

@@ -4,7 +4,7 @@ export function createSeasonAnimeEmbeds({
   season,
   year,
   animeMedia,
-  getStatusEmoji,
+  getStatusEmoji
 }: {
   season: string
   year: number
@@ -19,16 +19,20 @@ export function createSeasonAnimeEmbeds({
     const endIndex = Math.min(startIndex + animePerEmbed, animeMedia.length)
     const animeSlice = animeMedia.slice(startIndex, endIndex)
 
-    const animeList = animeSlice.map((anime, index) => {
-      const title = anime.title.english || anime.title.romaji
-      const statusEmoji = getStatusEmoji(anime.status)
-      return `${startIndex + index + 1}. **${title}** ${statusEmoji} (ID: ${anime.id})`
-    }).join('\n')
+    const animeList = animeSlice
+      .map((anime, index) => {
+        const title = anime.title.english || anime.title.romaji
+        const statusEmoji = getStatusEmoji(anime.status)
+        return `${startIndex + index + 1}. **${title}** ${statusEmoji} (ID: ${anime.id})`
+      })
+      .join('\n')
 
     const embed = new EmbedBuilder()
-      .setTitle(`${season.charAt(0).toUpperCase() + season.slice(1)} ${year} Anime${totalEmbeds > 1 ? ` (Part ${i + 1}/${totalEmbeds})` : ''}`)
+      .setTitle(
+        `${season.charAt(0).toUpperCase() + season.slice(1)} ${year} Anime${totalEmbeds > 1 ? ` (Part ${i + 1}/${totalEmbeds})` : ''}`
+      )
       .setDescription(animeList)
-      .setColor(0x02A9FF)
+      .setColor(0x02a9ff)
 
     if (i === 0) {
       embed.setFooter({ text: `Showing all ${animeMedia.length} anime from ${season} ${year}` })
