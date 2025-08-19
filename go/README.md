@@ -31,6 +31,14 @@ Search for anime by title or AniList ID.
 
 Display currently releasing anime with their next episode schedules.
 
+Supports pagination:
+
+- `/anime release page:<number> perpage:<number>`
+  - `page` (optional): Page number to view (default: 1)
+  - `perpage` (optional): Number of anime per page (default: 15, max: 50)
+  - Example: `/anime release page:2 perpage:25`
+    Shows page info and total count in the embed footer.
+
 ### `/anime season <season> [year]`
 
 Get all anime from a specific season and year.

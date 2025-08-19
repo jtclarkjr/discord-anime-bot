@@ -4,7 +4,7 @@ import { makeAniListRequest } from '@/utils/request'
 /**
  * Get all currently releasing anime
  */
-export async function getReleasingAnime(page: number = 1, perPage: number = 25) {
+export async function getReleasingAnime(page: number, perPage: number) {
   const query = `
     query ($page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {

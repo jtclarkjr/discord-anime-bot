@@ -14,8 +14,27 @@ import (
 
 // handleReleaseCommand handles the anime release subcommand
 func (b *Bot) handleReleaseCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	// Get currently releasing anime
-	releasingAnime, err := anilist.GetReleasingAnime(1, 25)
+	// Default values
+	page := 1
+	perPage := 15
+
+	// Parse options for page and perpage
+	if len(i.ApplicationCommandData().Options) > 0 {
+		for _, opt := range i.ApplicationCommandData().Options[0].Options {
+			switch opt.Name {
+			case "page":
+				if v, ok := opt.Value.(float64); ok {
+					page = int(v)
+				}
+			case "perpage":
+				if v, ok := opt.Value.(float64); ok {
+					perPage = int(v)
+				}
+			}
+		}
+	}
+
+	releasingAnime, err := anilist.GetReleasingAnime(page, perPage)
 	if err != nil {
 		log.Printf("Error getting releasing anime: %v", err)
 		b.respondWithError(s, i, "❌ An error occurred while fetching releasing anime.")
@@ -27,14 +46,8 @@ func (b *Bot) handleReleaseCommand(s *discordgo.Session, i *discordgo.Interactio
 		return
 	}
 
-	// Create a list of currently releasing anime (limit to 15)
 	var animeList []string
-	maxItems := 15
-	if len(releasingAnime.Data.Page.Media) < maxItems {
-		maxItems = len(releasingAnime.Data.Page.Media)
-	}
-
-	for _, anime := range releasingAnime.Data.Page.Media[:maxItems] {
+	for _, anime := range releasingAnime.Data.Page.Media {
 		title := anime.Title.Romaji
 		if anime.Title.English != nil && *anime.Title.English != "" {
 			title = *anime.Title.English
@@ -52,12 +65,13 @@ func (b *Bot) handleReleaseCommand(s *discordgo.Session, i *discordgo.Interactio
 		animeList = append(animeList, fmt.Sprintf("**%s** (ID: %d)%s", title, anime.ID, nextEpisodeInfo))
 	}
 
+	pageInfo := releasingAnime.Data.Page.PageInfo
 	embed := &discordgo.MessageEmbed{
 		Title:       "Currently Releasing Anime",
 		Description: strings.Join(animeList, "\n"),
 		Color:       0x02A9FF,
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("Showing %d of %d releasing anime", maxItems, releasingAnime.Data.Page.PageInfo.Total),
+			Text: fmt.Sprintf("Page %d/%d • Showing %d of %d releasing anime", pageInfo.CurrentPage, pageInfo.LastPage, len(releasingAnime.Data.Page.Media), pageInfo.Total),
 		},
 	}
 
