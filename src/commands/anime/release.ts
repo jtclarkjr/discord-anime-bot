@@ -7,7 +7,10 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
   await interaction.deferReply()
 
   try {
-    const releasingAnime = await getReleasingAnime()
+    // Get pagination options from the interaction
+    const page = interaction.options.getInteger('page') || 1
+    const perPage = interaction.options.getInteger('perpage') || 15
+    const releasingAnime = await getReleasingAnime(page, perPage)
 
     if (releasingAnime.media.length === 0) {
       await interaction.editReply('❌ No releasing anime found.')
@@ -16,7 +19,6 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
 
     // Create a list of currently releasing anime
     const animeList = releasingAnime.media
-      .slice(0, 15)
       .map((anime) => {
         const title = anime.title.english || anime.title.romaji
         let nextEpisodeInfo = ''
@@ -35,7 +37,7 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
 
     const embed = createReleaseAnimeEmbed(
       animeList,
-      Math.min(15, releasingAnime.media.length),
+      releasingAnime.media.length,
       releasingAnime.pageInfo.total
     )
 

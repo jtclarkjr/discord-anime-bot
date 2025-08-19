@@ -13,7 +13,7 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime watchlist add <id>` - Add an anime to your personal watchlist
 - `/anime watchlist list` - Show your personal anime watchlist (only visible to you)
 - `/anime watchlist remove <id>` - Remove an anime from your personal watchlist
-- `/anime release` - Show all currently releasing anime
+- `/anime release [page] [perpage]` - Show currently releasing anime with pagination
 - `/anime season <season> [year]` - Get all anime from a specific season and year
 - `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI/ Claude API key)_
 
@@ -91,7 +91,10 @@ src/
 - Lists currently releasing anime
 - Shows next episode numbers and air dates
 - Sorted by popularity
-- Displays up to 15 anime with pagination info
+- Supports pagination: use `/anime release page:<number> perpage:<number>`
+- `page` (optional): Page number to view (default: 1)
+- `perpage` (optional): Number of anime per page (default: 15, max: 50)
+- Displays up to `perpage` anime per page, with navigation info
 
 ### Season Command
 

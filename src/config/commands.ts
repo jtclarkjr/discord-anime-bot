@@ -109,7 +109,21 @@ export const animeCommandDefinition = {
     {
       name: 'release',
       type: 1, // SUB_COMMAND type
-      description: 'Show all currently releasing anime'
+      description: 'Show all currently releasing anime',
+      options: [
+        {
+          name: 'page',
+          type: 4, // INTEGER type
+          description: 'Page number',
+          required: false
+        },
+        {
+          name: 'perpage',
+          type: 4, // INTEGER type
+          description: 'Anime per page (max 50)',
+          required: false
+        }
+      ]
     },
     {
       name: 'season',
