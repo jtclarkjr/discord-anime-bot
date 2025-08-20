@@ -12,9 +12,8 @@ export { animeCommandDefinition } from '@/config/commands'
 
 export async function handleAnimeCommand(interaction: ChatInputCommandInteraction) {
   const subcommand = interaction.options.getSubcommand()
-  const subcommandGroup = interaction.options.getSubcommandGroup()
 
-  switch (subcommandGroup || subcommand) {
+  switch (subcommand) {
     case 'search':
       await handleSearchCommand(interaction)
       break

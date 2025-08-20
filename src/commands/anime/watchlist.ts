@@ -3,30 +3,35 @@ import { getUserWatchlist, addToWatchlist, removeFromWatchlist } from '@/service
 import { createWatchlistEmbed } from '@/embeds/watchlistAnimeEmbed'
 
 export async function handleWatchlistCommand(interaction: ChatInputCommandInteraction) {
-  const subcommand = interaction.options.getSubcommand()
+  const action = interaction.options.getString('action')
+  const animeId = interaction.options.getInteger('id')
 
-  switch (subcommand) {
+  // If no action is specified, show the list
+  if (!action) {
+    await handleWatchlistListCommand(interaction)
+    return
+  }
+
+  // Validate that ID is provided for actions that require it
+  if ((action === 'add' || action === 'remove') && !animeId) {
+    await interaction.reply({ content: '❌ Please provide an anime ID for this action.', flags: 1 << 6 })
+    return
+  }
+
+  switch (action) {
     case 'add':
-      await handleWatchlistAddCommand(interaction)
-      break
-    case 'list':
-      await handleWatchlistListCommand(interaction)
+      await handleWatchlistAddCommand(interaction, animeId!)
       break
     case 'remove':
-      await handleWatchlistRemoveCommand(interaction)
+      await handleWatchlistRemoveCommand(interaction, animeId!)
       break
     default:
-      await interaction.reply({ content: '❌ Unknown watchlist subcommand.', flags: 1 << 6 })
+      await interaction.reply({ content: '❌ Unknown watchlist action.', flags: 1 << 6 })
   }
 }
 
-async function handleWatchlistAddCommand(interaction: ChatInputCommandInteraction) {
+async function handleWatchlistAddCommand(interaction: ChatInputCommandInteraction, animeId: number) {
   await interaction.deferReply({ flags: 1 << 6 })
-  const animeId = interaction.options.getInteger('id')
-  if (!animeId) {
-    await interaction.editReply('❌ Please provide a valid anime ID.')
-    return
-  }
   try {
     const result = await addToWatchlist(interaction.user.id, animeId)
     if (result.success) {
@@ -59,13 +64,8 @@ async function handleWatchlistListCommand(interaction: ChatInputCommandInteracti
   }
 }
 
-async function handleWatchlistRemoveCommand(interaction: ChatInputCommandInteraction) {
+async function handleWatchlistRemoveCommand(interaction: ChatInputCommandInteraction, animeId: number) {
   await interaction.deferReply({ flags: 1 << 6 })
-  const animeId = interaction.options.getInteger('id')
-  if (!animeId) {
-    await interaction.editReply('❌ Please provide a valid anime ID.')
-    return
-  }
   try {
     const result = await removeFromWatchlist(interaction.user.id, animeId)
     if (result.success) {

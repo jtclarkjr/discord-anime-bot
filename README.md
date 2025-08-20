@@ -7,12 +7,12 @@ A Discord bot for searching anime information and tracking release schedules usi
 - `/anime help` - Show all available anime commands, subcommands, and arguments
 - `/anime search <query>` - Search for anime by name or AniList ID
 - `/anime next <id>` - Get next episode information for an anime by AniList ID
-- `/anime notify add <id>` - Set up notification for when the next episode airs
-- `/anime notify list` - List your active episode notifications
-- `/anime notify cancel <id>` - Cancel notification for an anime
-- `/anime watchlist add <id>` - Add an anime to your personal watchlist
-- `/anime watchlist list` - Show your personal anime watchlist (only visible to you)
-- `/anime watchlist remove <id>` - Remove an anime from your personal watchlist
+- `/anime notify` - List your active episode notifications (default)
+- `/anime notify action:add id:<id>` - Set up notification for when the next episode airs
+- `/anime notify action:cancel id:<id>` - Cancel notification for an anime
+- `/anime watchlist` - Show your personal anime watchlist (default, only visible to you)
+- `/anime watchlist action:add id:<id>` - Add an anime to your personal watchlist
+- `/anime watchlist action:remove id:<id>` - Remove an anime from your personal watchlist
 - `/anime release [page] [perpage]` - Show currently releasing anime with pagination
 - `/anime season <season> [year]` - Get all anime from a specific season and year
 - `/anime find <prompt>` - Find anime using AI based on description (powered by GPT-5) _(requires OpenAI/ Claude API key)_
@@ -80,11 +80,15 @@ src/
 
 ### Notification Commands
 
-- **Add**: Set up automatic notifications for when episodes air with `/anime notify add <id>`
-- **List**: View all your active episode notifications with `/anime notify list`
-- **Cancel**: Remove notifications for specific anime with `/anime notify cancel <id>`
+- **List (Default)**: View all your active episode notifications with `/anime notify`
+- **Add**: Set up automatic notifications for when episodes air with `/anime notify action:add id:<id>`
+- **Cancel**: Remove notifications for specific anime with `/anime notify action:cancel id:<id>`
 - Notifications are sent automatically when episodes air
 - One notification per anime per user is maintained
+- **Examples**:
+  - `/anime notify` - Shows your current notifications
+  - `/anime notify action:add id:21` - Get notified for One Piece episodes
+  - `/anime notify action:cancel id:21` - Stop One Piece notifications
 
 ### Release Command
 
@@ -131,11 +135,12 @@ src/
 
 The bot includes an automatic notification system for new episode releases:
 
-- **Set Notifications**: Use `/anime notify add <id>` to get notified when an episode airs
+- **Easy Access**: Simply use `/anime notify` to see all your active notifications
+- **Set Notifications**: Use `/anime notify action:add id:<id>` to get notified when an episode airs
 - **Automatic Delivery**: Notifications are sent in the same channel where you set them up
 - **Smart Scheduling**: The bot calculates exact air times and schedules notifications accordingly
 - **One Per Anime**: Only one notification per anime per user is maintained
-- **Easy Management**: List active notifications with `/anime notify list` and cancel with `/anime notify cancel <id>`
+- **Easy Management**: Cancel notifications with `/anime notify action:cancel id:<id>`
 - **Error Handling**: Gracefully handles finished anime, invalid IDs, and scheduling conflicts
 
 ## Setup

@@ -9,31 +9,35 @@ import {
 import { createNotifyListEmbed, createNotifyCancelEmbed } from '@/embeds/notifyAnimeEmbed'
 
 export async function handleNotifyCommand(interaction: ChatInputCommandInteraction) {
-  const subcommand = interaction.options.getSubcommand()
+  const action = interaction.options.getString('action')
+  const animeId = interaction.options.getInteger('id')
 
-  switch (subcommand) {
+  // If no action is specified, show the list
+  if (!action) {
+    await handleNotifyListCommand(interaction)
+    return
+  }
+
+  // Validate that ID is provided for actions that require it
+  if ((action === 'add' || action === 'cancel') && !animeId) {
+    await interaction.reply({ content: '❌ Please provide an anime ID for this action.', flags: 1 << 6 })
+    return
+  }
+
+  switch (action) {
     case 'add':
-      await handleNotifyAddCommand(interaction)
-      break
-    case 'list':
-      await handleNotifyListCommand(interaction)
+      await handleNotifyAddCommand(interaction, animeId!)
       break
     case 'cancel':
-      await handleNotifyCancelCommand(interaction)
+      await handleNotifyCancelCommand(interaction, animeId!)
       break
     default:
-      await interaction.reply('❌ Unknown notify subcommand.')
+      await interaction.reply('❌ Unknown notify action.')
   }
 }
 
-async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction) {
+async function handleNotifyAddCommand(interaction: ChatInputCommandInteraction, animeId: number) {
   await interaction.deferReply({ flags: 1 << 6 })
-
-  const animeId = interaction.options.getInteger('id')
-  if (!animeId) {
-    await interaction.editReply('❌ Please provide a valid anime ID.')
-    return
-  }
 
   // console.log(`🔔 [NotifyAdd] Starting add notification for anime ${animeId}`)
 
@@ -100,14 +104,8 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
   }
 }
 
-async function handleNotifyCancelCommand(interaction: ChatInputCommandInteraction) {
+async function handleNotifyCancelCommand(interaction: ChatInputCommandInteraction, animeId: number) {
   await interaction.deferReply({ flags: 1 << 6 })
-
-  const animeId = interaction.options.getInteger('id')
-  if (!animeId) {
-    await interaction.editReply('❌ Please provide a valid anime ID.')
-    return
-  }
 
   try {
     const removed = await removeUserNotification(

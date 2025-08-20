@@ -32,77 +32,47 @@ export const animeCommandDefinition = {
     },
     {
       name: 'notify',
-      type: 2, // SUB_COMMAND_GROUP type
-      description: 'Episode notification commands',
+      type: 1, // SUB_COMMAND type
+      description: 'Manage episode notifications (shows list by default)',
       options: [
         {
-          name: 'add',
-          type: 1, // SUB_COMMAND type
-          description: 'Set notification for next episode',
-          options: [
-            {
-              name: 'id',
-              type: 4, // INTEGER type
-              description: 'AniList ID of the anime',
-              required: true
-            }
+          name: 'action',
+          type: 3, // STRING type
+          description: 'Action to perform (add or cancel)',
+          required: false,
+          choices: [
+            { name: 'Add notification', value: 'add' },
+            { name: 'Cancel notification', value: 'cancel' }
           ]
         },
         {
-          name: 'list',
-          type: 1, // SUB_COMMAND type
-          description: 'List your active episode notifications'
-        },
-        {
-          name: 'cancel',
-          type: 1, // SUB_COMMAND type
-          description: 'Cancel notification for an anime',
-          options: [
-            {
-              name: 'id',
-              type: 4, // INTEGER type
-              description: 'AniList ID of the anime',
-              required: true
-            }
-          ]
+          name: 'id',
+          type: 4, // INTEGER type
+          description: 'AniList ID of the anime (required for add/cancel)',
+          required: false
         }
       ]
     },
     {
       name: 'watchlist',
-      type: 2, // SUB_COMMAND_GROUP type
-      description: 'Personal anime watchlist commands',
+      type: 1, // SUB_COMMAND type
+      description: 'Manage your anime watchlist (shows list by default)',
       options: [
         {
-          name: 'add',
-          type: 1, // SUB_COMMAND type
-          description: 'Add an anime to your watchlist',
-          options: [
-            {
-              name: 'id',
-              type: 4, // INTEGER type
-              description: 'AniList ID of the anime',
-              required: true
-            }
+          name: 'action',
+          type: 3, // STRING type
+          description: 'Action to perform (add or remove)',
+          required: false,
+          choices: [
+            { name: 'Add to watchlist', value: 'add' },
+            { name: 'Remove from watchlist', value: 'remove' }
           ]
         },
         {
-          name: 'list',
-          type: 1, // SUB_COMMAND type
-          description: 'Show your anime watchlist'
-        },
-        {
-          name: 'remove',
-          type: 1, // SUB_COMMAND type
-          description: 'Remove an anime from your watchlist',
-          options: [
-            {
-              name: 'id',
-              type: 4, // INTEGER type
-              description: 'AniList ID of the anime',
-              required: true
-            }
-          ]
+          name: 'id',
+          type: 4, // INTEGER type
+          description: 'AniList ID of the anime (required for add/remove)',
+          required: false
         }
       ]
     },

@@ -136,40 +136,60 @@ func (b *Bot) ready(s *discordgo.Session, event *discordgo.Ready) {
 			},
 		},
 		{
-			Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "notify",
-			Description: "Episode notification commands",
+			Description: "Manage episode notifications (shows list by default)",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "add",
-					Description: "Set notification for next episode",
-					Options: []*discordgo.ApplicationCommandOption{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "action",
+					Description: "Action to perform (add or cancel)",
+					Required:    false,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
 						{
-							Type:        discordgo.ApplicationCommandOptionInteger,
-							Name:        "id",
-							Description: "The AniList ID of the anime",
-							Required:    true,
+							Name:  "Add notification",
+							Value: "add",
+						},
+						{
+							Name:  "Cancel notification",
+							Value: "cancel",
 						},
 					},
 				},
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "list",
-					Description: "List your active episode notifications",
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "id",
+					Description: "AniList ID of the anime (required for add/cancel)",
+					Required:    false,
 				},
+			},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "watchlist",
+			Description: "Manage your anime watchlist (shows list by default)",
+			Options: []*discordgo.ApplicationCommandOption{
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Name:        "cancel",
-					Description: "Cancel notification for an anime",
-					Options: []*discordgo.ApplicationCommandOption{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "action",
+					Description: "Action to perform (add or remove)",
+					Required:    false,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
 						{
-							Type:        discordgo.ApplicationCommandOptionInteger,
-							Name:        "id",
-							Description: "The AniList ID of the anime",
-							Required:    true,
+							Name:  "Add to watchlist",
+							Value: "add",
+						},
+						{
+							Name:  "Remove from watchlist",
+							Value: "remove",
 						},
 					},
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "id",
+					Description: "AniList ID of the anime (required for add/remove)",
+					Required:    false,
 				},
 			},
 		},

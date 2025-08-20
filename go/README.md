@@ -7,6 +7,7 @@ A Discord bot written in Go that helps users find, search, and track anime using
 - **AI-Powered Anime Search**: Use natural language descriptions to find anime with GPT-5 _(requires OpenAI/ Claude API key)_
 - **Traditional Search**: Search anime by title using AniList API
 - **Episode Notifications**: Get notified when new anime episodes air
+- **Watchlist Management**: Track your personal anime watchlist
 - **Currently Releasing**: View currently airing anime with schedules
 - **Next Episode Info**: Check when the next episode of any anime airs
 - **Persistent Storage**: Notifications persist across bot restarts using JSON storage
@@ -59,15 +60,29 @@ Get information about the next episode of a specific anime.
 
 Manage episode notifications:
 
-- `/anime notify add <id>` - Set notification for next episode
-- `/anime notify list` - View your active notifications
-- `/anime notify cancel <id>` - Cancel notification for an anime
+- `/anime notify` - View your active notifications (default)
+- `/anime notify action:add id:<id>` - Set notification for next episode
+- `/anime notify action:cancel id:<id>` - Cancel notification for an anime
 
 **Examples**:
 
-- `/anime notify add 21` - Get notified for One Piece episodes
-- `/anime notify list` - See all your notifications
-- `/anime notify cancel 21` - Stop One Piece notifications
+- `/anime notify` - See all your current notifications
+- `/anime notify action:add id:21` - Get notified for One Piece episodes
+- `/anime notify action:cancel id:21` - Stop One Piece notifications
+
+### `/anime watchlist` commands
+
+Manage your personal anime watchlist:
+
+- `/anime watchlist` - View your anime watchlist (default)
+- `/anime watchlist action:add id:<id>` - Add an anime to your watchlist
+- `/anime watchlist action:remove id:<id>` - Remove an anime from your watchlist
+
+**Examples**:
+
+- `/anime watchlist` - See your current watchlist
+- `/anime watchlist action:add id:21` - Add One Piece to your watchlist
+- `/anime watchlist action:remove id:21` - Remove One Piece from your watchlist
 
 ## Setup
 

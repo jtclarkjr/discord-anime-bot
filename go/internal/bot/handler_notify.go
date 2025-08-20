@@ -12,30 +12,30 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// handleNotifyCommand handles the anime notify subcommand group
+// handleNotifyCommand handles the anime notify command
 func (b *Bot) handleNotifyCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		b.respondWithError(s, i, "No notify subcommand provided")
+	var action string
+	var animeID int
+
+	// Parse options
+	for _, option := range options {
+		switch option.Name {
+		case "action":
+			action = option.StringValue()
+		case "id":
+			animeID = int(option.IntValue())
+		}
+	}
+
+	// If no action is specified, show the list
+	if action == "" {
+		b.handleNotifyListCommand(s, i)
 		return
 	}
 
-	subcommand := options[0]
-	switch subcommand.Name {
-	case "add":
-		b.handleNotifyAddCommand(s, i, subcommand.Options)
-	case "list":
-		b.handleNotifyListCommand(s, i)
-	case "cancel":
-		b.handleNotifyCancelCommand(s, i, subcommand.Options)
-	default:
-		b.respondWithError(s, i, "Unknown notify subcommand")
-	}
-}
-
-// handleNotifyAddCommand handles adding a notification
-func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		message := "Please provide an anime ID"
+	// Validate that ID is provided for actions that require it
+	if (action == "add" || action == "cancel") && animeID == 0 {
+		message := "Please provide an anime ID for this action."
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -45,7 +45,18 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 		return
 	}
 
-	animeID := int(options[0].IntValue())
+	switch action {
+	case "add":
+		b.handleNotifyAddCommand(s, i, animeID)
+	case "cancel":
+		b.handleNotifyCancelCommand(s, i, animeID)
+	default:
+		b.respondWithError(s, i, "Unknown notify action")
+	}
+}
+
+// handleNotifyAddCommand handles adding a notification
+func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.InteractionCreate, animeID int) {
 	userID := i.Member.User.ID
 	channelID := i.ChannelID
 
@@ -181,19 +192,7 @@ func (b *Bot) handleNotifyListCommand(s *discordgo.Session, i *discordgo.Interac
 }
 
 // handleNotifyCancelCommand handles cancelling a notification
-func (b *Bot) handleNotifyCancelCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		message := "Please provide an anime ID"
-		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-			Content: &message,
-		})
-		if err != nil {
-			log.Printf("Failed to edit interaction response: %v", err)
-		}
-		return
-	}
-
-	animeID := int(options[0].IntValue())
+func (b *Bot) handleNotifyCancelCommand(s *discordgo.Session, i *discordgo.InteractionCreate, animeID int) {
 	userID := i.Member.User.ID
 	channelID := i.ChannelID
 

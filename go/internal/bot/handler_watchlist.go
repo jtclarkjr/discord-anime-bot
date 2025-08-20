@@ -9,33 +9,45 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// handleWatchlistCommand handles the anime watchlist subcommand group
+// handleWatchlistCommand handles the anime watchlist command
 func (b *Bot) handleWatchlistCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		b.respondWithError(s, i, "No watchlist subcommand provided")
+	var action string
+	var animeID int
+
+	// Parse options
+	for _, option := range options {
+		switch option.Name {
+		case "action":
+			action = option.StringValue()
+		case "id":
+			animeID = int(option.IntValue())
+		}
+	}
+
+	// If no action is specified, show the list
+	if action == "" {
+		b.handleWatchlistListCommand(s, i)
 		return
 	}
 
-	subcommand := options[0]
-	switch subcommand.Name {
-	case "add":
-		b.handleWatchlistAddCommand(s, i, subcommand.Options)
-	case "list":
-		b.handleWatchlistListCommand(s, i)
-	case "remove":
-		b.handleWatchlistRemoveCommand(s, i, subcommand.Options)
-	default:
-		b.respondWithError(s, i, "Unknown watchlist subcommand")
-	}
-}
-
-func (b *Bot) handleWatchlistAddCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		msg := "Please provide an anime ID"
+	// Validate that ID is provided for actions that require it
+	if (action == "add" || action == "remove") && animeID == 0 {
+		msg := "Please provide an anime ID for this action."
 		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 		return
 	}
-	animeID := int(options[0].IntValue())
+
+	switch action {
+	case "add":
+		b.handleWatchlistAddCommand(s, i, animeID)
+	case "remove":
+		b.handleWatchlistRemoveCommand(s, i, animeID)
+	default:
+		b.respondWithError(s, i, "Unknown watchlist action")
+	}
+}
+
+func (b *Bot) handleWatchlistAddCommand(s *discordgo.Session, i *discordgo.InteractionCreate, animeID int) {
 	userID := i.Member.User.ID
 	msg, err := anilist.AddToWatchlist(userID, animeID)
 	if err == nil && msg == "Anime added to your watchlist." {
@@ -80,13 +92,7 @@ func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.Inte
 	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 }
 
-func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
-	if len(options) == 0 {
-		msg := "Please provide an anime ID"
-		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
-		return
-	}
-	animeID := int(options[0].IntValue())
+func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.InteractionCreate, animeID int) {
 	userID := i.Member.User.ID
 	msg, err := anilist.RemoveFromWatchlist(userID, animeID)
 	if err == nil && msg == "Anime removed from your watchlist." {
