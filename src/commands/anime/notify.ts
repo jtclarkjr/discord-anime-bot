@@ -20,7 +20,10 @@ export async function handleNotifyCommand(interaction: ChatInputCommandInteracti
 
   // Validate that ID is provided for actions that require it
   if ((action === 'add' || action === 'cancel') && !animeId) {
-    await interaction.reply({ content: '❌ Please provide an anime ID for this action.', flags: 1 << 6 })
+    await interaction.reply({
+      content: '❌ Please provide an anime ID for this action.',
+      flags: 1 << 6
+    })
     return
   }
 
@@ -104,7 +107,10 @@ async function handleNotifyListCommand(interaction: ChatInputCommandInteraction)
   }
 }
 
-async function handleNotifyCancelCommand(interaction: ChatInputCommandInteraction, animeId: number) {
+async function handleNotifyCancelCommand(
+  interaction: ChatInputCommandInteraction,
+  animeId: number
+) {
   await interaction.deferReply({ flags: 1 << 6 })
 
   try {

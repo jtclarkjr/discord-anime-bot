@@ -14,7 +14,10 @@ export async function handleWatchlistCommand(interaction: ChatInputCommandIntera
 
   // Validate that ID is provided for actions that require it
   if ((action === 'add' || action === 'remove') && !animeId) {
-    await interaction.reply({ content: '❌ Please provide an anime ID for this action.', flags: 1 << 6 })
+    await interaction.reply({
+      content: '❌ Please provide an anime ID for this action.',
+      flags: 1 << 6
+    })
     return
   }
 
@@ -30,7 +33,10 @@ export async function handleWatchlistCommand(interaction: ChatInputCommandIntera
   }
 }
 
-async function handleWatchlistAddCommand(interaction: ChatInputCommandInteraction, animeId: number) {
+async function handleWatchlistAddCommand(
+  interaction: ChatInputCommandInteraction,
+  animeId: number
+) {
   await interaction.deferReply({ flags: 1 << 6 })
   try {
     const result = await addToWatchlist(interaction.user.id, animeId)
@@ -64,7 +70,10 @@ async function handleWatchlistListCommand(interaction: ChatInputCommandInteracti
   }
 }
 
-async function handleWatchlistRemoveCommand(interaction: ChatInputCommandInteraction, animeId: number) {
+async function handleWatchlistRemoveCommand(
+  interaction: ChatInputCommandInteraction,
+  animeId: number
+) {
   await interaction.deferReply({ flags: 1 << 6 })
   try {
     const result = await removeFromWatchlist(interaction.user.id, animeId)
