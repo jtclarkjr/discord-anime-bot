@@ -2,7 +2,7 @@
   "name": "discord-anime-bot",
   "version": "1.0.0",
   "description": "Discord anime bot",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "type": "module",
   "scripts": {
     "start": "bun src/index.ts",
