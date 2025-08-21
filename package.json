@@ -19,7 +19,7 @@
     "openai": "^5.13.1"
   },
   "devDependencies": {
-    "@types/bun": "^1.2.19",
+    "@types/bun": "^1.2.20",
     "oxlint": "^1.11.1",
     "prettier": "^3.6.2"
   }
