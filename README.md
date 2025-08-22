@@ -177,6 +177,8 @@ The bot includes an automatic notification system for new episode releases:
 **Optional:**
 
 - `OPENAI_API_KEY` - Your OpenAI API key for ChatGPT-5 access (enables `/anime find` command)
+- `STORAGE_FILE` - Path to notifications storage file (default: `./data/notifications.json`)
+- `WATCHLIST_FILE` - Path to watchlist storage file (default: `./data/watchlists.json`)
 
 ## Technologies Used
 

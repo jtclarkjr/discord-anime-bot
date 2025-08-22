@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"discord-anime-bot/internal/config"
 	"discord-anime-bot/internal/types"
 
 	"github.com/bwmarrin/discordgo"
@@ -45,7 +46,7 @@ func NewNotificationService(session *discordgo.Session) *NotificationService {
 	service := &NotificationService{
 		notifications: make(map[string]*notificationTimer),
 		session:       session,
-		filePath:      "../data/notifications.json",
+		filePath:      config.LoadConfig().StorageFile,
 	}
 
 	// Load existing notifications
@@ -103,13 +104,6 @@ func (ns *NotificationService) loadNotifications() {
 	}
 
 	log.Printf("Loaded %d notifications from storage", len(persistedNotifications))
-}
-
-// saveNotifications saves current notifications to the JSON file
-func (ns *NotificationService) saveNotifications() error {
-	ns.mu.RLock()
-	defer ns.mu.RUnlock()
-	return ns.saveNotificationsInternal()
 }
 
 // saveNotificationsInternal saves notifications without acquiring locks (internal use)
@@ -233,18 +227,6 @@ func (ns *NotificationService) sendNotification(entry *types.NotificationEntry) 
 	} else {
 		log.Printf("📢 Sent notification for anime %s episode %d to user %s", title, entry.Episode, entry.UserID)
 	}
-}
-
-// removeNotificationInternal removes a notification without locking (internal use)
-func (ns *NotificationService) removeNotificationInternal(key string) {
-	timer, exists := ns.notifications[key]
-	if !exists {
-		return
-	}
-
-	timer.Timer.Stop()
-	timer.CancelFunc()
-	delete(ns.notifications, key)
 }
 
 // AddNotification adds a new episode notification

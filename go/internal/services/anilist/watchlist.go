@@ -1,12 +1,13 @@
 package anilist
 
 import (
+	"discord-anime-bot/internal/config"
 	"encoding/json"
 	"os"
 	"sync"
 )
 
-var watchlistFile = "../../../../data/watchlists.json"
+var watchlistFile = config.LoadConfig().WatchlistFile
 var watchlistMu sync.Mutex
 
 type Watchlist map[string][]int // userID -> []animeID

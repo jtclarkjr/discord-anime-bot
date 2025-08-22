@@ -103,6 +103,8 @@ Create a `.env` file in the root directory:
 DISCORD_BOT_TOKEN=your_discord_bot_token_here
 CHANNEL_ID=your_channel_id_here
 ANILIST_API=https://graphql.anilist.co
+STORAGE_FILE=./data/notifications.json
+WATCHLIST_FILE=./data/watchlists.json
 ```
 
 **Optional (for AI features):**

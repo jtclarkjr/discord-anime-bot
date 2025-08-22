@@ -16,22 +16,26 @@ type Config struct {
 	IsClaudeEnabled bool
 	IsAIEnabled     bool
 	UseOpenAI       bool // true if OpenAI should be used, false if Claude should be used
+	StorageFile     string
+	WatchlistFile   string
 }
 
 // LoadConfig loads configuration from environment variables
 func LoadConfig() *Config {
 	cfg := &Config{
-		DiscordToken: getEnv("DISCORD_BOT_TOKEN"),
-		ChannelID:    getEnv("CHANNEL_ID"),
-		AniListAPI:   getEnv("ANILIST_API"),
-		OpenAIAPIKey: getEnvOptional("OPENAI_API_KEY"),
-		ClaudeAPIKey: getEnvOptional("CLAUDE_API_KEY"),
+		DiscordToken:  getEnv("DISCORD_BOT_TOKEN"),
+		ChannelID:     getEnv("CHANNEL_ID"),
+		AniListAPI:    getEnv("ANILIST_API"),
+		OpenAIAPIKey:  getEnvOptional("OPENAI_API_KEY"),
+		ClaudeAPIKey:  getEnvOptional("CLAUDE_API_KEY"),
+		StorageFile:   getEnv("STORAGE_FILE"),
+		WatchlistFile: getEnv("WATCHLIST_FILE"),
 	}
 
 	cfg.IsOpenAIEnabled = cfg.OpenAIAPIKey != ""
 	cfg.IsClaudeEnabled = cfg.ClaudeAPIKey != ""
 	cfg.IsAIEnabled = cfg.IsOpenAIEnabled || cfg.IsClaudeEnabled
-	cfg.UseOpenAI = cfg.IsOpenAIEnabled || (!cfg.IsOpenAIEnabled && cfg.IsClaudeEnabled == false)
+	cfg.UseOpenAI = cfg.IsOpenAIEnabled || (!cfg.IsOpenAIEnabled && !cfg.IsClaudeEnabled)
 
 	// Validate required environment variables
 	validateConfig(cfg)
