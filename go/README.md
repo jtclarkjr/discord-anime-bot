@@ -153,6 +153,12 @@ go/
 │   │   ├── handler_help.go         # Help command handler
 │   ├── config/                     # Configuration management
 │   │   └── config.go
+│   ├── graphql/                    # GraphQL query definitions
+│   │   ├── search_by_id.go         # Anime search by ID query
+│   │   ├── search_by_text.go       # Anime text search query
+│   │   ├── anime_details.go        # Anime details with next episode query
+│   │   ├── releasing_anime.go      # Currently releasing anime query
+│   │   └── seasonal_anime.go       # Seasonal anime query
 │   ├── services/                   # External service integrations
 │   │   ├── anilist/                # AniList API integration
 │   │   │   ├── search.go           # Anime search functionality

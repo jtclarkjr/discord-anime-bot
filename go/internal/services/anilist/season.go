@@ -8,35 +8,13 @@ import (
 	"os"
 	"strings"
 
+	"discord-anime-bot/internal/graphql"
 	"discord-anime-bot/internal/types"
 )
 
 // GetSeasonAnime gets all anime from a specific season and year
 func GetSeasonAnime(season string, seasonYear int, page, perPage int) (*types.SeasonAnimeResponse, error) {
 	anilistAPI := os.Getenv("ANILIST_API")
-	query := `
-	query SeasonAnime($season: MediaSeason, $seasonYear: Int, $type: MediaType, $page: Int, $perPage: Int) {
-		Page(page: $page, perPage: $perPage) {
-			media(season: $season, seasonYear: $seasonYear, type: $type, sort: [POPULARITY_DESC]) {
-				id
-				title { 
-					romaji 
-					english 
-				}
-				coverImage {
-					medium
-					large
-				}
-				status
-			}
-			pageInfo { 
-				total 
-				currentPage 
-				lastPage 
-				hasNextPage 
-			}
-		}
-	}`
 
 	variables := types.GraphQLSeasonVariables{
 		Season:     strings.ToUpper(season),
@@ -47,7 +25,7 @@ func GetSeasonAnime(season string, seasonYear int, page, perPage int) (*types.Se
 	}
 
 	requestBody := types.GraphQLRequest[types.GraphQLSeasonVariables]{
-		Query:     query,
+		Query:     graphql.GetSeasonalAnimeQuery,
 		Variables: variables,
 	}
 

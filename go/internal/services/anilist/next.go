@@ -7,42 +7,20 @@ import (
 	"net/http"
 	"os"
 
+	"discord-anime-bot/internal/graphql"
 	"discord-anime-bot/internal/types"
 )
 
 // GetAnimeByID gets anime details by ID including next airing episode
 func GetAnimeByID(animeID int) (*types.AnimeDetails, error) {
 	anilistAPI := os.Getenv("ANILIST_API")
-	query := `
-	query ($id: Int!) {
-		Media(id: $id, type: ANIME) {
-			id
-			title { 
-				romaji 
-				english 
-				native 
-			}
-			status
-			format
-			episodes
-			nextAiringEpisode {
-				episode
-				airingAt
-				timeUntilAiring
-			}
-			coverImage { 
-				large 
-			}
-			siteUrl
-		}
-	}`
 
 	variables := types.GraphQLNextVariables{
 		ID: animeID,
 	}
 
 	requestBody := types.GraphQLRequest[types.GraphQLNextVariables]{
-		Query:     query,
+		Query:     graphql.GetAnimeDetailsQuery,
 		Variables: variables,
 	}
 

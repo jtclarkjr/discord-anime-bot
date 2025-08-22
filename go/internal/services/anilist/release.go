@@ -7,34 +7,13 @@ import (
 	"net/http"
 	"os"
 
+	"discord-anime-bot/internal/graphql"
 	"discord-anime-bot/internal/types"
 )
 
 // GetReleasingAnime gets all currently releasing anime
 func GetReleasingAnime(page, perPage int) (*types.ReleasingAnimeResponse, error) {
 	anilistAPI := os.Getenv("ANILIST_API")
-	query := `
-	query ($page: Int, $perPage: Int) {
-		Page(page: $page, perPage: $perPage) {
-			media(type: ANIME, status: RELEASING, sort: [POPULARITY_DESC]) {
-				id
-				title { 
-					romaji 
-					english 
-				}
-				nextAiringEpisode {
-					episode
-					airingAt
-				}
-			}
-			pageInfo { 
-				total 
-				currentPage 
-				lastPage 
-				hasNextPage 
-			}
-		}
-	}`
 
 	variables := types.GraphQLSearchVariables{
 		Page:    page,
@@ -42,7 +21,7 @@ func GetReleasingAnime(page, perPage int) (*types.ReleasingAnimeResponse, error)
 	}
 
 	requestBody := types.GraphQLRequest[types.GraphQLSearchVariables]{
-		Query:     query,
+		Query:     graphql.GetReleasingAnimeQuery,
 		Variables: variables,
 	}
 

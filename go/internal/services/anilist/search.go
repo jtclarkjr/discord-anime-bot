@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"discord-anime-bot/internal/graphql"
 	"discord-anime-bot/internal/types"
 )
 
@@ -34,30 +35,13 @@ func SearchAnime(query string, page, perPage int) (*types.SearchResponse, error)
 
 // searchAnimeByID searches for anime by ID and returns it in page format
 func searchAnimeByID(anilistAPI string, animeID int) (*types.SearchResponse, error) {
-	searchQuery := `
-	query ($id: Int!) {
-		Media(id: $id, type: ANIME) {
-			id
-			title {
-				romaji
-				english
-				native
-			}
-			format
-			status
-			coverImage {
-				large
-			}
-			siteUrl
-		}
-	}`
 
 	variables := types.GraphQLSearchByIDVariables{
 		ID: animeID,
 	}
 
 	requestBody := types.GraphQLRequest[types.GraphQLSearchByIDVariables]{
-		Query:     searchQuery,
+		Query:     graphql.SearchAnimeByIDQuery,
 		Variables: variables,
 	}
 
@@ -107,31 +91,6 @@ func searchAnimeByID(anilistAPI string, animeID int) (*types.SearchResponse, err
 
 // searchAnimeByText searches for anime by text query
 func searchAnimeByText(anilistAPI, query string, page, perPage int) (*types.SearchResponse, error) {
-	searchQuery := `
-	query ($search: String, $page: Int, $perPage: Int) {
-		Page(page: $page, perPage: $perPage) {
-			pageInfo {
-				total
-				currentPage
-				lastPage
-				hasNextPage
-			}
-			media(search: $search, type: ANIME) {
-				id
-				title {
-					romaji
-					english
-					native
-				}
-				format
-				status
-				coverImage {
-					large
-				}
-				siteUrl
-			}
-		}
-	}`
 
 	variables := types.GraphQLSearchVariables{
 		Search:  query,
@@ -140,7 +99,7 @@ func searchAnimeByText(anilistAPI, query string, page, perPage int) (*types.Sear
 	}
 
 	requestBody := types.GraphQLRequest[types.GraphQLSearchVariables]{
-		Query:     searchQuery,
+		Query:     graphql.SearchAnimeByTextQuery,
 		Variables: variables,
 	}
 
