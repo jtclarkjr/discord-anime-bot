@@ -173,12 +173,12 @@ The bot includes an automatic notification system for new episode releases:
 - `DISCORD_BOT_TOKEN` - Your Discord bot token
 - `CHANNEL_ID` - The Discord channel ID where the bot operates
 - `ANILIST_API` - AniList GraphQL API endpoint (https://graphql.anilist.co)
+- `STORAGE_FILE` - Path to notifications storage file (default: `./data/notifications.json`)
+- `WATCHLIST_FILE` - Path to watchlist storage file (default: `./data/watchlists.json`)
 
 **Optional:**
 
 - `OPENAI_API_KEY` - Your OpenAI API key for ChatGPT-5 access (enables `/anime find` command)
-- `STORAGE_FILE` - Path to notifications storage file (default: `./data/notifications.json`)
-- `WATCHLIST_FILE` - Path to watchlist storage file (default: `./data/watchlists.json`)
 
 ## Technologies Used
 
