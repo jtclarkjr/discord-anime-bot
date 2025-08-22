@@ -27,6 +27,13 @@ Use `/anime help` to see a full list of all available commands, subcommands, and
 src/
 ├── config/
 │   └── constants.ts        # Environment variables and configuration constants
+├── graphql/
+│   ├── searchById.ts       # GraphQL query for anime search by ID
+│   ├── searchByText.ts     # GraphQL query for anime text search
+│   ├── animeDetails.ts     # GraphQL query for anime details with next episode
+│   ├── releasingAnime.ts   # GraphQL query for currently releasing anime
+│   ├── seasonalAnime.ts    # GraphQL query for seasonal anime
+│   └── index.ts            # GraphQL queries exports
 ├── types/
 │   ├── anilist.ts          # TypeScript type definitions for AniList API responses
 │   └── openai.ts           # TypeScript type definitions for OpenAI API responses

@@ -1,5 +1,6 @@
 import type { AnimeSearchResponse } from '@/types/anilist'
-import { makeAniListRequest } from '@utils/request'
+import { makeAniListRequest } from '@/utils/request'
+import { SEARCH_ANIME_BY_ID, SEARCH_ANIME_BY_TEXT } from '@/graphql'
 
 /**
  * Search for anime using AniList API
@@ -27,21 +28,8 @@ export async function searchAnime(searchQuery: string, page: number = 1, perPage
  * Search for anime by ID and return it in page format
  */
 async function searchAnimeById(animeId: number) {
-  const query = `
-    query ($id: Int!) {
-      Media(id: $id, type: ANIME) {
-        id
-        title { romaji english native }
-        format
-        status
-        coverImage { large }
-        siteUrl
-      }
-    }
-  `
-
   const variables = { id: animeId }
-  const json = await makeAniListRequest(query, variables)
+  const json = await makeAniListRequest(SEARCH_ANIME_BY_ID, variables)
 
   // Return in the same format as search results
   if (json.data?.Media) {
@@ -72,28 +60,12 @@ async function searchAnimeById(animeId: number) {
  * Search for anime by text query
  */
 async function searchAnimeByText(searchQuery: string, page: number, perPage: number) {
-  const query = `
-    query ($q: String!, $page: Int = 1, $perPage: Int = 10) {
-      Page(page: $page, perPage: $perPage) {
-        media(search: $q, type: ANIME, sort: [SEARCH_MATCH, POPULARITY_DESC]) {
-          id
-          title { romaji english native }
-          format
-          status
-          coverImage { large }
-          siteUrl
-        }
-        pageInfo { total currentPage lastPage hasNextPage }
-      }
-    }
-  `
-
   const variables = {
     q: searchQuery,
     page,
     perPage
   }
 
-  const json = (await makeAniListRequest(query, variables)) as AnimeSearchResponse
+  const json = (await makeAniListRequest(SEARCH_ANIME_BY_TEXT, variables)) as AnimeSearchResponse
   return json.data.Page
 }
