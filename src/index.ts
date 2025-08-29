@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { Client, GatewayIntentBits } from 'discord.js'
 import { handleAnimeCommand, animeCommandDefinition } from '@/commands/index'
 import { DISCORD_TOKEN, IS_CLAUDE_ENABLED, IS_OPENAI_ENABLED } from '@/config/constants'
