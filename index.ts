@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js'
 
 const DISCORD_TOKEN = process.env.DISCORD_BOT_TOKEN!
