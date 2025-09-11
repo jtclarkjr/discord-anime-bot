@@ -48,7 +48,7 @@ src/
 │   │   ├── watchlist.ts    # Watchlist anime API service
 │   │   └── index.ts        # Anime services exports
 │   ├── claude/
-│   │   ├── claude.go       # Claude completions service
+│   │   ├── claude.ts       # Claude completions service
 │   │   └── index.ts        # Claude services exports
 │   ├── openai/
 │   │   ├── completions.ts  # OpenAI ChatGPT completion service
