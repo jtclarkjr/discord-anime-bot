@@ -10,8 +10,7 @@
     "lint": "oxlint ./src --fix",
     "format": "prettier --write ./src",
     "test:redis": "bun --env-file=.env scripts/test-redis.ts",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
+    "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f app",
     "docker:redis-cli": "docker-compose exec redis redis-cli"

@@ -202,20 +202,14 @@ For production or simplified setup, use Docker:
 cp .env.example .env
 # Edit .env with your configuration
 
-# Start services (includes Redis)
+# Build and start services (includes Redis)
 docker-compose up --build
 
-# Or run in background
-bun run docker:up
-
-# View logs
-bun run docker:logs
-
 # Stop services
-bun run docker:down
+docker-compose down
 ```
 
-See [DOCKER.md](./DOCKER.md) for more Docker usage details.
+See [DOCKER.md](./DOCKER.md) for complete Docker documentation.
 
 ## Environment Variables
 

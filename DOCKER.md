@@ -25,13 +25,13 @@ This guide covers how to run the Discord Anime Bot using Docker with Redis for c
    ```
 
 2. **Start services**:
-
    ```bash
-   # Build and start in detached mode
+   # Build and start services
    bun run docker:up
-
+   
    # View logs
    bun run docker:logs
+   ```
    ```
 
 3. **Stop services**:
@@ -262,10 +262,9 @@ docker-compose up --build
 
 ## Available Scripts
 
-| Script                     | Description                  |
-| -------------------------- | ---------------------------- |
-| `bun run docker:build`     | Build images                 |
-| `bun run docker:up`        | Start services in background |
-| `bun run docker:down`      | Stop services                |
-| `bun run docker:logs`      | View app logs                |
-| `bun run docker:redis-cli` | Connect to Redis CLI         |
+|| Script                     | Description                  |
+|| -------------------------- | ---------------------------- |
+|| `bun run docker:up`        | Build and start services     |
+|| `bun run docker:down`      | Stop services                |
+|| `bun run docker:logs`      | View app logs                |
+|| `bun run docker:redis-cli` | Connect to Redis CLI         |
