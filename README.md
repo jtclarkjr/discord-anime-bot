@@ -209,7 +209,7 @@ docker-compose up --build
 docker-compose down
 ```
 
-See [DOCKER.md](./DOCKER.md) for complete Docker documentation.
+See [DOCKER.md](./DOCKER.md) for complete Docker documentation and [DEPLOYMENT.md](./DEPLOYMENT.md) for production deployment options including Google Cloud Run.
 
 ## Environment Variables
 
