@@ -1,52 +1,64 @@
-import { watchlistFile } from '@config/constants'
+import { redisCache } from '@/services/redis/cache'
 
-async function readWatchlists(): Promise<Record<string, number[]>> {
-  try {
-    const file = Bun.file(watchlistFile)
-    // Want the json to have {} when empty
-    if (!(await file.exists())) return {}
-    const raw = await file.text()
-    return JSON.parse(raw)
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      throw new Error('Failed to read watchlists: ' + err.message)
-    }
-    throw new Error('Failed to read watchlists')
-  }
-}
-
-async function writeWatchlists(data: Record<string, number[]>) {
-  await Bun.write(watchlistFile, JSON.stringify(data, null, 2))
-}
+// Redis key prefix for watchlists
+const WATCHLIST_KEY_PREFIX = 'watchlist:user:'
 
 export async function getUserWatchlist(userId: string): Promise<number[]> {
-  const lists = await readWatchlists()
-  return lists[userId] || []
+  try {
+    const redisKey = `${WATCHLIST_KEY_PREFIX}${userId}`
+    const watchlistItems = await redisCache.getSetMembers(redisKey)
+    return watchlistItems.map(item => parseInt(item, 10)).filter(id => !isNaN(id))
+  } catch (error) {
+    console.error(`Error getting watchlist for user ${userId}:`, error)
+    return []
+  }
 }
 
 export async function addToWatchlist(
   userId: string,
   animeId: number
 ): Promise<{ success: boolean; message: string }> {
-  const lists = await readWatchlists()
-  if (!lists[userId]) lists[userId] = []
-  if (lists[userId].includes(animeId)) {
-    return { success: false, message: 'Anime already in your watchlist.' }
+  try {
+    const redisKey = `${WATCHLIST_KEY_PREFIX}${userId}`
+    
+    // Check if anime is already in watchlist
+    const isAlreadyInWatchlist = await redisCache.isInSet(redisKey, animeId)
+    if (isAlreadyInWatchlist) {
+      return { success: false, message: 'Anime already in your watchlist.' }
+    }
+    
+    // Add anime to watchlist
+    await redisCache.addToSet(redisKey, animeId)
+    
+    // Set a reasonable TTL for the watchlist (30 days)
+    await redisCache.expire(redisKey, 30 * 24 * 60 * 60)
+    
+    return { success: true, message: 'Anime added to your watchlist.' }
+  } catch (error) {
+    console.error(`Error adding anime ${animeId} to watchlist for user ${userId}:`, error)
+    return { success: false, message: 'Failed to add anime to watchlist.' }
   }
-  lists[userId].push(animeId)
-  await writeWatchlists(lists)
-  return { success: true, message: 'Anime added to your watchlist.' }
 }
 
 export async function removeFromWatchlist(
   userId: string,
   animeId: number
 ): Promise<{ success: boolean; message: string }> {
-  const lists = await readWatchlists()
-  if (!lists[userId] || !lists[userId].includes(animeId)) {
-    return { success: false, message: 'Anime not found in your watchlist.' }
+  try {
+    const redisKey = `${WATCHLIST_KEY_PREFIX}${userId}`
+    
+    // Check if anime is in watchlist
+    const isInWatchlist = await redisCache.isInSet(redisKey, animeId)
+    if (!isInWatchlist) {
+      return { success: false, message: 'Anime not found in your watchlist.' }
+    }
+    
+    // Remove anime from watchlist
+    await redisCache.removeFromSet(redisKey, animeId)
+    
+    return { success: true, message: 'Anime removed from your watchlist.' }
+  } catch (error) {
+    console.error(`Error removing anime ${animeId} from watchlist for user ${userId}:`, error)
+    return { success: false, message: 'Failed to remove anime from watchlist.' }
   }
-  lists[userId] = lists[userId].filter((id) => id !== animeId)
-  await writeWatchlists(lists)
-  return { success: true, message: 'Anime removed from your watchlist.' }
 }

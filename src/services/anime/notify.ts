@@ -1,7 +1,7 @@
 import { Client, TextChannel } from 'discord.js'
 import { getAnimeById } from './next'
 import type { NotificationEntry } from '@/types/anilist'
-import { storageFile } from '@config/constants'
+import { redisCache } from '@/services/redis/cache'
 
 let notifications: Map<string, NotificationEntry> = new Map()
 let client: Client | null = null
@@ -16,55 +16,87 @@ export function setClient(newClient: Client) {
 }
 
 /**
- * Load notifications from storage and reschedule them
+ * Load notifications from Redis and reschedule them
  */
 async function loadNotifications() {
   try {
-    const file = Bun.file(storageFile)
-    if (!(await file.exists())) {
+    // Get all notification keys from Redis
+    const notificationKeys = await redisCache.getKeys('notification:*')
+    
+    if (notificationKeys.length === 0) {
+      console.log('No notifications found in Redis')
       return
     }
-    const data = await file.text()
-    const parseJson = <T>(json: string): T => JSON.parse(json) as T
-    const persistedNotifications = parseJson<NotificationEntry[]>(data)
+
     const now = Date.now()
-    for (const notification of persistedNotifications) {
-      if (notification.airingAt <= now) {
+    let loadedCount = 0
+
+    for (const redisKey of notificationKeys) {
+      const persistedNotification = await redisCache.get<NotificationEntry>(redisKey, true)
+      
+      if (!persistedNotification) continue
+      
+      // Skip expired notifications
+      if (persistedNotification.airingAt <= now) {
+        await redisCache.delete(redisKey)
         continue
       }
-      const notificationKey = `${notification.animeId}-${notification.channelId}-${notification.userId}`
-      const timeUntilAiring = notification.airingAt - now
+      
+      const notificationKey = `${persistedNotification.animeId}-${persistedNotification.channelId}-${persistedNotification.userId}`
+      const timeUntilAiring = persistedNotification.airingAt - now
+      
       const entry: NotificationEntry = {
-        ...notification,
+        ...persistedNotification,
         timeoutId: setTimeout(() => {
           sendNotification(entry)
         }, timeUntilAiring)
       }
+      
       notifications.set(notificationKey, entry)
+      loadedCount++
     }
-    console.log(`✅ Loaded ${notifications.size} active notifications from storage`)
+    
+    console.log(`Loaded ${loadedCount} active notifications from Redis`)
   } catch (error) {
-    console.error('Error loading notifications:', error)
+    console.error('Error loading notifications from Redis:', error)
   }
 }
 
 /**
- * Save notifications to persistent storage
+ * Save a single notification to Redis
  */
-async function saveNotifications() {
+async function saveNotification(notificationKey: string, entry: NotificationEntry): Promise<void> {
   try {
-    const persistedNotifications = Array.from(notifications.values()).map((entry) => ({
+    const redisKey = `notification:${notificationKey}`
+    const persistedEntry = {
       animeId: entry.animeId,
       channelId: entry.channelId,
       userId: entry.userId,
       airingAt: entry.airingAt,
       episode: entry.episode
-    }))
-    const safeNotifications = persistedNotifications || []
-    await Bun.write(storageFile, JSON.stringify(safeNotifications, null, 2))
-    console.log(`💾 [Save] Successfully saved ${safeNotifications.length} notifications to storage`)
+    }
+    
+    // Calculate TTL based on airing time (with some buffer)
+    const now = Date.now()
+    const ttlSeconds = Math.max(Math.ceil((entry.airingAt - now) / 1000) + 3600, 60) // At least 1 minute TTL
+    
+    await redisCache.set(redisKey, persistedEntry, ttlSeconds)
+    console.log(`[Save] Successfully saved notification ${notificationKey} to Redis`)
   } catch (error) {
-    console.error('💾 [Save] Error saving notifications:', error)
+    console.error(`[Save] Error saving notification ${notificationKey} to Redis:`, error)
+  }
+}
+
+/**
+ * Remove a notification from Redis
+ */
+async function removeNotificationFromRedis(notificationKey: string): Promise<void> {
+  try {
+    const redisKey = `notification:${notificationKey}`
+    await redisCache.delete(redisKey)
+    console.log(`[Remove] Successfully removed notification ${notificationKey} from Redis`)
+  } catch (error) {
+    console.error(`[Remove] Error removing notification ${notificationKey} from Redis:`, error)
   }
 }
 
@@ -149,8 +181,8 @@ export async function addNotification(
 
     notifications.set(notificationKey, entry)
 
-    // Save to persistent storage
-    await saveNotifications()
+    // Save to Redis
+    await saveNotification(notificationKey, entry)
 
     return {
       success: true,
@@ -180,7 +212,7 @@ function removeNotificationInternal(notificationKey: string): boolean {
 export async function removeNotification(notificationKey: string): Promise<boolean> {
   const removed = removeNotificationInternal(notificationKey)
   if (removed) {
-    await saveNotifications()
+    await removeNotificationFromRedis(notificationKey)
   }
   return removed
 }
@@ -208,12 +240,12 @@ async function sendNotification(entry: NotificationEntry) {
     const anime = await getAnimeById(entry.animeId)
     if (!anime) return
     const title = anime.title.english || anime.title.romaji
-    const message = `🎉 <@${entry.userId}> Episode ${entry.episode} of **${title}** has just aired!\n\n🔗 [AniList Details](${anime.siteUrl})`
+    const message = `<@${entry.userId}> Episode ${entry.episode} of **${title}** has just aired!\n\n[AniList Details](${anime.siteUrl})`
     await channel.send(message)
     // Remove the notification after sending
     const notificationKey = `${entry.animeId}-${entry.channelId}-${entry.userId}`
     notifications.delete(notificationKey)
-    await saveNotifications()
+    await removeNotificationFromRedis(notificationKey)
   } catch (error) {
     console.error('Error sending notification:', error)
   }
@@ -233,17 +265,24 @@ export function getUserNotifications(userId: string, channelId?: string): Notifi
  */
 export async function cleanup() {
   const now = Date.now()
-  let hasChanges = false
+  const keysToRemove: string[] = []
+  
   for (const [key, entry] of notifications.entries()) {
     if (entry.airingAt <= now) {
       if (entry.timeoutId) {
         clearTimeout(entry.timeoutId)
       }
       notifications.delete(key)
-      hasChanges = true
+      keysToRemove.push(key)
     }
   }
-  if (hasChanges) {
-    await saveNotifications()
+  
+  // Remove expired notifications from Redis
+  for (const key of keysToRemove) {
+    await removeNotificationFromRedis(key)
+  }
+  
+  if (keysToRemove.length > 0) {
+    console.log(`[Cleanup] Removed ${keysToRemove.length} expired notifications`)
   }
 }

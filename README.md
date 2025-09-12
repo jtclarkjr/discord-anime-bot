@@ -152,26 +152,70 @@ The bot includes an automatic notification system for new episode releases:
 
 ## Setup
 
+### Local Development
+
 1. Install dependencies:
 
    ```bash
    bun i
    ```
 
-2. Create a `.env` file with:
+2. Set up Redis:
 
+   ```bash
+   # Using Docker (recommended)
+   docker run -d --name redis -p 6379:6379 redis:7-alpine
+
+   # Or install locally (macOS)
+   brew install redis
+   brew services start redis
    ```
+
+3. Create a `.env` file with:
+
+   ```bash
    DISCORD_BOT_TOKEN=your_discord_bot_token
    CHANNEL_ID=your_channel_id
    ANILIST_API=https://graphql.anilist.co
-   OPENAI_API_KEY=your_openai_api_key
+   REDIS_URL=redis://localhost:6379
+   OPENAI_API_KEY=your_openai_api_key  # Optional
+   CLAUDE_API_KEY=your_claude_api_key  # Optional
    ```
 
-3. Run the bot:
+4. Test Redis connection:
+
    ```bash
-   bun dev
-   docker compose up --build
+   bun run test:redis
    ```
+
+5. Run the bot:
+   ```bash
+   bun run dev
+   ```
+
+### Docker Deployment
+
+For production or simplified setup, use Docker:
+
+```bash
+# Copy environment template
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start services (includes Redis)
+docker-compose up --build
+
+# Or run in background
+bun run docker:up
+
+# View logs
+bun run docker:logs
+
+# Stop services
+bun run docker:down
+```
+
+See [DOCKER.md](./DOCKER.md) for more Docker usage details.
 
 ## Environment Variables
 

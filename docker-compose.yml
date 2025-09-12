@@ -7,7 +7,37 @@ services:
       - '8081:8081' # Can change to 8080:8080 if needed
     env_file:
       - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
     volumes:
-      - ./data:/app/data # Mount data directory for persistent notifications
       - /app/node_modules # Prevents overwriting node_modules inside container
     command: ['bun', 'start']
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - anime-bot-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - anime-bot-network
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  anime-bot-network:
+    driver: bridge

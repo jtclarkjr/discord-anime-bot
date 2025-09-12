@@ -32,5 +32,13 @@ FROM base
 # Copy built application
 COPY --from=build /app /app
 
+# Expose port
+EXPOSE 8081
+
+# Create non-root user for security
+RUN groupadd -r anime && useradd -r -g anime anime
+RUN chown -R anime:anime /app
+USER anime
+
 # Start the server by default, this can be overwritten at runtime
 CMD [ "bun", "run", "start" ]
