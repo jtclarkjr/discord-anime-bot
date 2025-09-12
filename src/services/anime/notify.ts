@@ -22,7 +22,7 @@ async function loadNotifications() {
   try {
     // Get all notification keys from Redis
     const notificationKeys = await redisCache.getKeys('notification:*')
-    
+
     if (notificationKeys.length === 0) {
       console.log('No notifications found in Redis')
       return
@@ -33,29 +33,29 @@ async function loadNotifications() {
 
     for (const redisKey of notificationKeys) {
       const persistedNotification = await redisCache.get<NotificationEntry>(redisKey, true)
-      
+
       if (!persistedNotification) continue
-      
+
       // Skip expired notifications
       if (persistedNotification.airingAt <= now) {
         await redisCache.delete(redisKey)
         continue
       }
-      
+
       const notificationKey = `${persistedNotification.animeId}-${persistedNotification.channelId}-${persistedNotification.userId}`
       const timeUntilAiring = persistedNotification.airingAt - now
-      
+
       const entry: NotificationEntry = {
         ...persistedNotification,
         timeoutId: setTimeout(() => {
           sendNotification(entry)
         }, timeUntilAiring)
       }
-      
+
       notifications.set(notificationKey, entry)
       loadedCount++
     }
-    
+
     console.log(`Loaded ${loadedCount} active notifications from Redis`)
   } catch (error) {
     console.error('Error loading notifications from Redis:', error)
@@ -75,11 +75,11 @@ async function saveNotification(notificationKey: string, entry: NotificationEntr
       airingAt: entry.airingAt,
       episode: entry.episode
     }
-    
+
     // Calculate TTL based on airing time (with some buffer)
     const now = Date.now()
     const ttlSeconds = Math.max(Math.ceil((entry.airingAt - now) / 1000) + 3600, 60) // At least 1 minute TTL
-    
+
     await redisCache.set(redisKey, persistedEntry, ttlSeconds)
     console.log(`[Save] Successfully saved notification ${notificationKey} to Redis`)
   } catch (error) {
@@ -266,7 +266,7 @@ export function getUserNotifications(userId: string, channelId?: string): Notifi
 export async function cleanup() {
   const now = Date.now()
   const keysToRemove: string[] = []
-  
+
   for (const [key, entry] of notifications.entries()) {
     if (entry.airingAt <= now) {
       if (entry.timeoutId) {
@@ -276,12 +276,12 @@ export async function cleanup() {
       keysToRemove.push(key)
     }
   }
-  
+
   // Remove expired notifications from Redis
   for (const key of keysToRemove) {
     await removeNotificationFromRedis(key)
   }
-  
+
   if (keysToRemove.length > 0) {
     console.log(`[Cleanup] Removed ${keysToRemove.length} expired notifications`)
   }

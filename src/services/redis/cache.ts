@@ -29,7 +29,7 @@ export class RedisCache {
   async set(key: string, value: string | object, ttlSeconds?: number): Promise<void> {
     const client = await this.ensureConnection()
     const serializedValue = typeof value === 'string' ? value : JSON.stringify(value)
-    
+
     if (ttlSeconds) {
       await client.setEx(key, ttlSeconds, serializedValue)
     } else {
@@ -43,9 +43,9 @@ export class RedisCache {
   async get<T = string>(key: string, parseJson = false): Promise<T | null> {
     const client = await this.ensureConnection()
     const value = await client.get(key)
-    
+
     if (value === null) return null
-    
+
     if (parseJson) {
       try {
         return JSON.parse(value) as T
@@ -54,7 +54,7 @@ export class RedisCache {
         return null
       }
     }
-    
+
     return value as T
   }
 
@@ -134,9 +134,9 @@ export class RedisCache {
   async getHashField<T = string>(key: string, field: string, parseJson = false): Promise<T | null> {
     const client = await this.ensureConnection()
     const value = await client.hGet(key, field)
-    
+
     if (value === undefined || value === null) return null
-    
+
     if (parseJson) {
       try {
         return JSON.parse(value) as T
@@ -145,7 +145,7 @@ export class RedisCache {
         return null
       }
     }
-    
+
     return value as T
   }
 
@@ -155,9 +155,9 @@ export class RedisCache {
   async getHashAll<T = Record<string, string>>(key: string, parseJson = false): Promise<T | null> {
     const client = await this.ensureConnection()
     const hash = await client.hGetAll(key)
-    
+
     if (!hash || Object.keys(hash).length === 0) return null
-    
+
     if (parseJson) {
       const parsed: Record<string, unknown> = {}
       for (const [field, value] of Object.entries(hash)) {
@@ -170,7 +170,7 @@ export class RedisCache {
       }
       return parsed as T
     }
-    
+
     return hash as T
   }
 
@@ -239,11 +239,11 @@ export class RedisCache {
   async multi(operations: Array<() => Promise<unknown>>): Promise<unknown[]> {
     const client = await this.ensureConnection()
     const multi = client.multi()
-    
+
     for (const operation of operations) {
       await operation()
     }
-    
+
     return await multi.exec()
   }
 }

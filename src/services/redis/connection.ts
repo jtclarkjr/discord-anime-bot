@@ -80,7 +80,7 @@ class RedisConnection {
 
       await this.client.connect()
       this.isConnecting = false
-      
+
       console.log('Redis connection established')
       return this.client
     } catch (error) {

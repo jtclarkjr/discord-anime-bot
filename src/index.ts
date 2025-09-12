@@ -82,26 +82,26 @@ client.once('clientReady', async () => {
 // Graceful shutdown handling
 process.on('SIGINT', async () => {
   console.log('\nShutting down gracefully...')
-  
+
   try {
     await redisConnection.disconnect()
   } catch (error) {
     console.error('Error disconnecting from Redis:', error)
   }
-  
+
   client.destroy()
   process.exit(0)
 })
 
 process.on('SIGTERM', async () => {
   console.log('\nReceived SIGTERM, shutting down gracefully...')
-  
+
   try {
     await redisConnection.disconnect()
   } catch (error) {
     console.error('Error disconnecting from Redis:', error)
   }
-  
+
   client.destroy()
   process.exit(0)
 })
