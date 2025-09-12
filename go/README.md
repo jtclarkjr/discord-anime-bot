@@ -1,6 +1,6 @@
 # Discord Anime Bot - Go Version
 
-A Discord bot written in Go that helps users find, search, and track anime using AI-powered descriptions and the AniList API. Features episode notifications with persistent storage.
+A Discord bot written in Go that helps users find, search, and track anime using AI-powered descriptions and the AniList API. Features episode notifications with Redis-based caching for scalability.
 
 ## Features
 
@@ -10,7 +10,7 @@ A Discord bot written in Go that helps users find, search, and track anime using
 - **Watchlist Management**: Track your personal anime watchlist
 - **Currently Releasing**: View currently airing anime with schedules
 - **Next Episode Info**: Check when the next episode of any anime airs
-- **Persistent Storage**: Notifications persist across bot restarts using JSON storage
+- **Redis Caching**: Scalable Redis-based storage for notifications and watchlists
 - **Rich Discord Embeds**: Beautiful embedded responses with anime details
 - **Slash Commands**: Modern Discord slash command interface
 
@@ -89,6 +89,7 @@ Manage your personal anime watchlist:
 ### Prerequisites
 
 - Go 1.21 or higher
+- Redis server (local or remote)
 - Discord Bot Token
 - AniList API endpoint (typically `https://graphql.anilist.co`)
 - OpenAI API Key (optional, for AI-powered search features)
@@ -103,36 +104,62 @@ Create a `.env` file in the root directory:
 DISCORD_BOT_TOKEN=your_discord_bot_token_here
 CHANNEL_ID=your_channel_id_here
 ANILIST_API=https://graphql.anilist.co
-STORAGE_FILE=./data/notifications.json
-WATCHLIST_FILE=./data/watchlists.json
+REDIS_URL=redis://localhost:6380
 ```
 
 **Optional (for AI features):**
 
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
+CLAUDE_API_KEY=your_claude_api_key_here
 ```
 
 ### Installation
 
-1. Clone the repository
-2. Navigate to the `go` directory
-3. Install dependencies:
+#### Local Development
+
+1. **Set up Redis**:
+   ```bash
+   # Using Docker (recommended)
+   docker run -d --name redis -p 6380:6379 redis:7-alpine
+   
+   # Or install locally (macOS)
+   brew install redis
+   brew services start redis
+   ```
+
+2. **Clone and setup**:
+   ```bash
+   git clone <repository>
+   cd discord-anime-bot/go
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Install dependencies**:
    ```bash
    go mod download
    ```
-4. Build and run:
+
+4. **Test Redis connection**:
    ```bash
-   make build
-   make run
+   go run scripts/test-redis.go
    ```
 
-### Development
+5. **Run the bot**:
+   ```bash
+   go run .
+   ```
 
-- `make dev` - Run in development mode with auto-reload
-- `make build` - Build the binary
-- `make clean` - Clean build artifacts
-- `make test` - Run tests
+#### Docker Deployment
+
+```bash
+# Start with Redis included
+docker-compose up --build
+
+# Stop services
+docker-compose down
+```
 
 ## Project Structure
 
@@ -166,9 +193,12 @@ go/
 │   │   │   ├── release.go          # Currently releasing anime
 │   │   │   ├── season.go           # Seasonal anime data
 │   │   │   ├── next.go             # Next episode data
-│   │   │   ├── notify.go           # Notification service
-│   │   │   ├── watchlist.go        # Watchlist service
-│   │   └── claude/                 # Claude API integration
+│   │   │   ├── notify.go           # Notification service (Redis-based)
+│   │   │   └── watchlist.go        # Watchlist service (Redis-based)
+│   │   ├── redis/                  # Redis cache integration
+│   │   │   ├── connection.go       # Redis connection manager
+│   │   │   └── cache.go            # Redis cache operations
+│   │   ├── claude/                 # Claude API integration
 │   │   │   └── claude.go           # Claude completions
 │   │   └── openai/                 # OpenAI API integration
 │   │       └── completions.go
@@ -177,18 +207,19 @@ go/
 │   │   └── openai.go               # OpenAI API types
 │   └── utils/                      # Utility functions
 │       └── formatters.go           # Time and date formatting
-├── data/                           # Data storage
-│   └── notifications.json         # Persistent notification storage
+├── scripts/                        # Development scripts
+│   └── test-redis.go               # Redis connection test
 ├── go.mod                          # Go module definition
 ├── go.sum                          # Dependency checksums
-├── Makefile                        # Build automation
 └── README.md                       # This file
 ```
 
 ## Dependencies
 
 - **discordgo**: Discord API library for Go
-- **go-openai**: OpenAI API client for Go
+- **go-redis**: Redis client for Go
+- **anthropic-sdk-go**: Claude API client for Go
+- **openai-go**: OpenAI API client for Go
 - **godotenv**: Environment variable loading
 
 ## Architecture
@@ -196,8 +227,8 @@ go/
 The bot uses a modular architecture with clear separation of concerns:
 
 - **Handlers**: Each command type has its own handler file for maintainability
-- **Services**: External API integrations (AniList, OpenAI) are encapsulated
-- **Persistent Storage**: JSON-based storage for notifications with automatic cleanup
+- **Services**: External API integrations (AniList, OpenAI, Redis) are encapsulated
+- **Redis Storage**: Scalable Redis-based caching with TTL and automatic cleanup
 - **Concurrent Safety**: Thread-safe notification management with proper synchronization
 - **Error Handling**: Comprehensive error handling with user-friendly Discord responses
 
@@ -205,11 +236,12 @@ The bot uses a modular architecture with clear separation of concerns:
 
 The notification system provides:
 
-- **Persistent Storage**: Notifications survive bot restarts
+- **Redis Storage**: Scalable Redis-based persistence with automatic TTL
 - **Automatic Scheduling**: Uses Go's `time.AfterFunc` for precise timing
-- **Cleanup**: Automatic removal of expired notifications
-- **User Management**: Per-user notification tracking
-- **Memory Efficient**: Minimal memory footprint with cleanup on notification fire
+- **Smart Cleanup**: Automatic removal of expired notifications via Redis TTL
+- **User Management**: Per-user notification tracking with Redis sets
+- **Memory Efficient**: Minimal memory footprint with Redis-based storage
+- **High Availability**: Redis clustering support for production deployments
 
 ## License
 

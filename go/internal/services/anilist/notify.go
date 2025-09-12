@@ -2,15 +2,12 @@ package anilist
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
-	"discord-anime-bot/internal/config"
+	"discord-anime-bot/internal/services/redis"
 	"discord-anime-bot/internal/types"
 
 	"github.com/bwmarrin/discordgo"
@@ -38,7 +35,6 @@ type NotificationService struct {
 	notifications map[string]*notificationTimer
 	session       *discordgo.Session
 	mu            sync.RWMutex
-	filePath      string
 }
 
 // NewNotificationService creates a new notification service
@@ -46,7 +42,6 @@ func NewNotificationService(session *discordgo.Session) *NotificationService {
 	service := &NotificationService{
 		notifications: make(map[string]*notificationTimer),
 		session:       session,
-		filePath:      config.LoadConfig().StorageFile,
 	}
 
 	// Load existing notifications
@@ -55,88 +50,96 @@ func NewNotificationService(session *discordgo.Session) *NotificationService {
 	return service
 }
 
-// loadNotifications loads notifications from the JSON file
+// loadNotifications loads notifications from Redis and reschedules them
 func (ns *NotificationService) loadNotifications() {
-	// Check if file exists
-	if _, err := os.Stat(ns.filePath); os.IsNotExist(err) {
-		return
-	}
+	ctx := context.Background()
 
-	data, err := os.ReadFile(ns.filePath)
+	// Get all notification keys from Redis
+	notificationKeys, err := redis.Keys(ctx, "notification:*")
 	if err != nil {
-		log.Printf("Error reading notifications file: %v", err)
+		log.Printf("Error fetching notification keys from Redis: %v", err)
 		return
 	}
 
-	// Handle edge case where file contains "null" instead of empty array
-	if string(data) == "null" || string(data) == "" {
-		log.Printf("Notifications file is null or empty, initializing with empty array")
+	if len(notificationKeys) == 0 {
+		log.Println("No notifications found in Redis")
 		return
 	}
 
-	var persistedNotifications []types.PersistedNotification
-	if err := json.Unmarshal(data, &persistedNotifications); err != nil {
-		log.Printf("Error parsing notifications file: %v", err)
-		// Reset file to empty array if parsing fails
-		if err := ns.saveNotificationsInternal(); err != nil {
-			log.Printf("Failed to reset notifications file: %v", err)
+	now := time.Now()
+	loadedCount := 0
+
+	for _, redisKey := range notificationKeys {
+		var persistedNotification types.PersistedNotification
+		err := redis.Get(ctx, redisKey, &persistedNotification)
+		if err != nil {
+			log.Printf("Error getting notification %s from Redis: %v", redisKey, err)
+			continue
 		}
-		return
-	}
 
-	log.Printf("Successfully parsed %d notifications from file", len(persistedNotifications))
-
-	// Recreate timers for future notifications
-	for _, pn := range persistedNotifications {
-		// Convert from milliseconds (TypeScript format) to seconds for Go
-		airingTime := time.Unix(pn.AiringAt/1000, 0)
-		if airingTime.After(time.Now()) {
-			notification := types.NotificationEntry{
-				AnimeID:   pn.AnimeID,
-				ChannelID: pn.ChannelID,
-				UserID:    pn.UserID,
-				AiringAt:  pn.AiringAt / 1000, // Convert to seconds for storage
-				Episode:   pn.Episode,
-			}
-
-			ns.scheduleNotification(&notification)
+		// Skip expired notifications
+		airingTime := time.Unix(persistedNotification.AiringAt/1000, 0)
+		if airingTime.Before(now) {
+			// Remove expired notification
+			redis.Delete(ctx, redisKey)
+			continue
 		}
+
+		notification := types.NotificationEntry{
+			AnimeID:   persistedNotification.AnimeID,
+			ChannelID: persistedNotification.ChannelID,
+			UserID:    persistedNotification.UserID,
+			AiringAt:  persistedNotification.AiringAt / 1000, // Convert to seconds
+			Episode:   persistedNotification.Episode,
+		}
+
+		ns.scheduleNotificationInternal(&notification)
+		loadedCount++
 	}
 
-	log.Printf("Loaded %d notifications from storage", len(persistedNotifications))
+	log.Printf("Loaded %d active notifications from Redis", loadedCount)
 }
 
-// saveNotificationsInternal saves notifications without acquiring locks (internal use)
-func (ns *NotificationService) saveNotificationsInternal() error {
-	// Initialize as empty slice to ensure JSON marshals as [] not null
-	persistedNotifications := make([]types.PersistedNotification, 0)
+// saveNotificationToRedis saves a single notification to Redis
+func (ns *NotificationService) saveNotificationToRedis(notificationKey string, entry *types.NotificationEntry) error {
+	ctx := context.Background()
+	redisKey := "notification:" + notificationKey
 
-	for _, timer := range ns.notifications {
-		persistedNotifications = append(persistedNotifications, types.PersistedNotification{
-			AnimeID:   timer.Entry.AnimeID,
-			ChannelID: timer.Entry.ChannelID,
-			UserID:    timer.Entry.UserID,
-			AiringAt:  timer.Entry.AiringAt,
-			Episode:   timer.Entry.Episode,
-		})
+	persistedEntry := types.PersistedNotification{
+		AnimeID:   entry.AnimeID,
+		ChannelID: entry.ChannelID,
+		UserID:    entry.UserID,
+		AiringAt:  entry.AiringAt * 1000, // Convert to milliseconds for consistency
+		Episode:   entry.Episode,
 	}
 
-	if err := os.MkdirAll(filepath.Dir(ns.filePath), 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %w", err)
+	// Calculate TTL based on airing time (with buffer)
+	airingTime := time.Unix(entry.AiringAt, 0)
+	ttl := time.Until(airingTime) + time.Hour // 1 hour buffer
+	if ttl <= 0 {
+		ttl = time.Minute // Minimum 1 minute TTL
 	}
 
-	data, err := json.MarshalIndent(persistedNotifications, "", "  ")
+	err := redis.Set(ctx, redisKey, persistedEntry, ttl)
 	if err != nil {
-		return fmt.Errorf("failed to marshal notifications: %w", err)
+		return fmt.Errorf("failed to save notification to Redis: %w", err)
 	}
 
-	log.Printf("💾 Saved %d notifications to storage", len(persistedNotifications))
+	log.Printf("Saved notification %s to Redis", notificationKey)
+	return nil
+}
 
-	if err := os.WriteFile(ns.filePath, data, 0644); err != nil {
-		return fmt.Errorf("failed to write notifications file: %w", err)
+// removeNotificationFromRedis removes a notification from Redis
+func (ns *NotificationService) removeNotificationFromRedis(notificationKey string) error {
+	ctx := context.Background()
+	redisKey := "notification:" + notificationKey
+
+	err := redis.Delete(ctx, redisKey)
+	if err != nil {
+		return fmt.Errorf("failed to remove notification from Redis: %w", err)
 	}
 
-	log.Printf("💾 Saved %d notifications to storage", len(persistedNotifications))
+	log.Printf("Removed notification %s from Redis", notificationKey)
 	return nil
 }
 
@@ -160,7 +163,7 @@ func (ns *NotificationService) scheduleNotificationInternal(entry *types.Notific
 	airingTime := time.Unix(entry.AiringAt, 0)
 	delay := time.Until(airingTime)
 	if delay <= 0 {
-		log.Printf("⚠️ Notification for anime %d is in the past, skipping", entry.AnimeID)
+		log.Printf("Warning: Notification for anime %d is in the past, skipping", entry.AnimeID)
 		return
 	}
 
@@ -172,10 +175,12 @@ func (ns *NotificationService) scheduleNotificationInternal(entry *types.Notific
 			return
 		default:
 			ns.sendNotification(entry)
-			// Remove the notification after sending (no saving needed since it's fired)
+			// Remove the notification after sending
 			ns.mu.Lock()
 			delete(ns.notifications, notificationKey)
 			ns.mu.Unlock()
+			// Remove from Redis as well
+			ns.removeNotificationFromRedis(notificationKey)
 		}
 	})
 
@@ -185,7 +190,7 @@ func (ns *NotificationService) scheduleNotificationInternal(entry *types.Notific
 		CancelFunc: cancel,
 	}
 
-	log.Printf("⏰ Scheduled notification for anime %d in %v", entry.AnimeID, delay)
+	log.Printf("Scheduled notification for anime %d in %v", entry.AnimeID, delay)
 }
 
 // sendNotification sends the Discord notification
@@ -203,7 +208,7 @@ func (ns *NotificationService) sendNotification(entry *types.NotificationEntry) 
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:       "🔔 Episode Alert!",
+		Title:       "Episode Alert!",
 		Description: fmt.Sprintf("**Episode %d** of **%s** is now airing!", entry.Episode, title),
 		Color:       0x00FF00,
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
@@ -225,7 +230,7 @@ func (ns *NotificationService) sendNotification(entry *types.NotificationEntry) 
 	if err != nil {
 		log.Printf("Error sending notification: %v", err)
 	} else {
-		log.Printf("📢 Sent notification for anime %s episode %d to user %s", title, entry.Episode, entry.UserID)
+		log.Printf("Sent notification for anime %s episode %d to user %s", title, entry.Episode, entry.UserID)
 	}
 }
 
@@ -251,13 +256,13 @@ func (ns *NotificationService) AddNotification(animeID int, channelID, userID st
 		Episode:   episode,
 	}
 
-	log.Printf("🔔 Adding notification for anime %d, episode %d", animeID, episode)
+	log.Printf("Adding notification for anime %d, episode %d", animeID, episode)
 
 	// Schedule the notification (internal method that doesn't acquire locks)
 	ns.scheduleNotificationInternal(entry)
 
-	// Save to file (using internal method to avoid deadlock)
-	return ns.saveNotificationsInternal()
+	// Save to Redis
+	return ns.saveNotificationToRedis(notificationKey, entry)
 }
 
 // RemoveNotification removes a notification for a specific anime and user
@@ -276,8 +281,8 @@ func (ns *NotificationService) RemoveNotification(animeID int, channelID, userID
 	timer.CancelFunc()
 	delete(ns.notifications, notificationKey)
 
-	// Save to file (using internal method to avoid deadlock)
-	return ns.saveNotificationsInternal()
+	// Remove from Redis
+	return ns.removeNotificationFromRedis(notificationKey)
 }
 
 // GetUserNotifications returns all notifications for a specific user
@@ -295,21 +300,17 @@ func (ns *NotificationService) GetUserNotifications(userID string) []*types.Noti
 	return notifications
 }
 
-// Cleanup stops all timers and saves notifications
+// Cleanup stops all timers
 func (ns *NotificationService) Cleanup() {
 	ns.mu.Lock()
 	defer ns.mu.Unlock()
 
-	log.Println("🧹 Cleaning up notification service...")
+	log.Println("Cleaning up notification service...")
 
 	for _, timer := range ns.notifications {
 		timer.Timer.Stop()
 		timer.CancelFunc()
 	}
 
-	if err := ns.saveNotificationsInternal(); err != nil {
-		log.Printf("Error saving notifications during cleanup: %v", err)
-	}
-
-	log.Println("✅ Notification service cleanup complete")
+	log.Println("Notification service cleanup complete")
 }

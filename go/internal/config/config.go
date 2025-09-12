@@ -16,20 +16,18 @@ type Config struct {
 	IsClaudeEnabled bool
 	IsAIEnabled     bool
 	UseOpenAI       bool // true if OpenAI should be used, false if Claude should be used
-	StorageFile     string
-	WatchlistFile   string
+	RedisURL        string
 }
 
 // LoadConfig loads configuration from environment variables
 func LoadConfig() *Config {
 	cfg := &Config{
-		DiscordToken:  getEnv("DISCORD_BOT_TOKEN"),
-		ChannelID:     getEnv("CHANNEL_ID"),
-		AniListAPI:    getEnv("ANILIST_API"),
-		OpenAIAPIKey:  getEnvOptional("OPENAI_API_KEY"),
-		ClaudeAPIKey:  getEnvOptional("CLAUDE_API_KEY"),
-		StorageFile:   getEnv("STORAGE_FILE"),
-		WatchlistFile: getEnv("WATCHLIST_FILE"),
+		DiscordToken: getEnv("DISCORD_BOT_TOKEN"),
+		ChannelID:    getEnv("CHANNEL_ID"),
+		AniListAPI:   getEnv("ANILIST_API"),
+		OpenAIAPIKey: getEnvOptional("OPENAI_API_KEY"),
+		ClaudeAPIKey: getEnvOptional("CLAUDE_API_KEY"),
+		RedisURL:     getEnvWithDefault("REDIS_URL", "redis://localhost:6379"),
 	}
 
 	cfg.IsOpenAIEnabled = cfg.OpenAIAPIKey != ""
@@ -46,7 +44,7 @@ func LoadConfig() *Config {
 func getEnv(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		log.Printf("⚠️  Warning: %s environment variable is not set", key)
+		log.Printf("Warning: %s environment variable is not set", key)
 	}
 	return value
 }
@@ -54,28 +52,36 @@ func getEnv(key string) string {
 func getEnvOptional(key string) string {
 	value := os.Getenv(key)
 	if value == "" {
-		log.Printf("⚠️ %s environment variable is not set. Related features will be disabled.", key)
+		log.Printf("Warning: %s environment variable is not set. Related features will be disabled.", key)
+	}
+	return value
+}
+
+func getEnvWithDefault(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
 	}
 	return value
 }
 
 func validateConfig(cfg *Config) {
 	if cfg.DiscordToken == "" {
-		log.Fatal("❌ DISCORD_BOT_TOKEN is not set in environment variables.")
+		log.Fatal("DISCORD_BOT_TOKEN is not set in environment variables.")
 	}
 	if cfg.ChannelID == "" {
-		log.Fatal("❌ CHANNEL_ID is not set in environment variables.")
+		log.Fatal("CHANNEL_ID is not set in environment variables.")
 	}
 	if cfg.AniListAPI == "" {
-		log.Fatal("❌ ANILIST_API is not set in environment variables.")
+		log.Fatal("ANILIST_API is not set in environment variables.")
 	}
 
 	// AI logic
 	if cfg.IsOpenAIEnabled {
-		log.Println("✅ OpenAI features enabled (find command available)")
+		log.Println("OpenAI features enabled (find command available)")
 	} else if cfg.IsClaudeEnabled {
-		log.Println("✅ Claude features enabled (find command available)")
+		log.Println("Claude features enabled (find command available)")
 	} else {
-		log.Println("⚠️ No AI features enabled (find command not available)")
+		log.Println("Warning: No AI features enabled (find command not available)")
 	}
 }

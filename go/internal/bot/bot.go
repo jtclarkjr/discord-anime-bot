@@ -6,6 +6,7 @@ import (
 
 	"discord-anime-bot/internal/config"
 	"discord-anime-bot/internal/services/anilist"
+	"discord-anime-bot/internal/services/redis"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -19,6 +20,12 @@ type Bot struct {
 
 // NewBot creates a new bot instance
 func NewBot(cfg *config.Config) (*Bot, error) {
+	// Initialize Redis connection
+	if err := redis.InitRedis(cfg.RedisURL); err != nil {
+		log.Printf("Failed to connect to Redis: %v", err)
+		log.Println("Bot will continue without Redis (features may not work properly)")
+	}
+
 	session, err := discordgo.New("Bot " + cfg.DiscordToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Discord session: %w", err)
@@ -58,6 +65,10 @@ func (b *Bot) Stop() {
 	}
 	if b.session != nil {
 		b.session.Close()
+	}
+	// Close Redis connection
+	if err := redis.Close(); err != nil {
+		log.Printf("Error closing Redis connection: %v", err)
 	}
 }
 
@@ -233,12 +244,12 @@ func (b *Bot) ready(s *discordgo.Session, event *discordgo.Ready) {
 		for _, cmd := range commands {
 			_, err := s.ApplicationCommandCreate(s.State.User.ID, guilds[0].ID, cmd)
 			if err != nil {
-				log.Printf("❌ Failed to register command %s: %v", cmd.Name, err)
+				log.Printf("Failed to register command %s: %v", cmd.Name, err)
 			} else {
-				log.Printf("✅ Successfully registered command: %s", cmd.Name)
+				log.Printf("Successfully registered command: %s", cmd.Name)
 			}
 		}
 	} else {
-		log.Println("⚠️ No guilds found. Commands may not be registered.")
+		log.Println("Warning: No guilds found. Commands may not be registered.")
 	}
 }

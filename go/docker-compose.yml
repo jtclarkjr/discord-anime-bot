@@ -4,14 +4,42 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        GO_VERSION: "1.24.1" 
+        GO_VERSION: "1.24.1"
     ports:
-      - "8082:8082" # Can change to 8080:8080 if needed
+      - "8082:8082"
     env_file:
       - .env
     environment:
       - ENV=production
       - COMPOSE_BAKE=true
-    volumes:
-      - ../data:/app/data # Mount data directory for persistent notifications  
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - anime-bot-network
     command: ["/usr/local/bin/run-app"]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6380:6379'  # Different port to avoid conflict with main Redis
+    volumes:
+      - redis-go-data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - anime-bot-network
+
+volumes:
+  redis-go-data:
+    driver: local
+
+networks:
+  anime-bot-network:
+    driver: bridge
