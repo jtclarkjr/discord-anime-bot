@@ -15,7 +15,7 @@ import (
 func (b *Bot) handleSeasonCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
 	// Get season parameter
 	if len(options) == 0 {
-		b.respondWithError(s, i, "❌ Season parameter is required.")
+		b.respondWithError(s, i, "Season parameter is required.")
 		return
 	}
 
@@ -32,7 +32,7 @@ func (b *Bot) handleSeasonCommand(s *discordgo.Session, i *discordgo.Interaction
 	}
 
 	if !isValidSeason {
-		b.respondWithError(s, i, "❌ Invalid season. Please use: winter, spring, summer, or fall.")
+		b.respondWithError(s, i, "Invalid season. Please use: winter, spring, summer, or fall.")
 		return
 	}
 
@@ -45,12 +45,12 @@ func (b *Bot) handleSeasonCommand(s *discordgo.Session, i *discordgo.Interaction
 	// Fetch seasonal anime
 	seasonAnime, err := anilist.GetSeasonAnime(season, year, 1, 50)
 	if err != nil {
-		b.respondWithError(s, i, "❌ An error occurred while fetching seasonal anime.")
+		b.respondWithError(s, i, "An error occurred while fetching seasonal anime.")
 		return
 	}
 
 	if len(seasonAnime.Data.Page.Media) == 0 {
-		b.respondWithError(s, i, fmt.Sprintf("❌ No anime found for %s %d.", season, year))
+		b.respondWithError(s, i, fmt.Sprintf("No anime found for %s %d.", season, year))
 		return
 	}
 
@@ -88,7 +88,7 @@ func (b *Bot) handleSeasonCommand(s *discordgo.Session, i *discordgo.Interaction
 	}
 
 	if err != nil {
-		b.respondWithError(s, i, "❌ Failed to send seasonal anime information.")
+		b.respondWithError(s, i, "Failed to send seasonal anime information.")
 	}
 }
 
@@ -145,16 +145,16 @@ func (b *Bot) createSeasonEmbeds(media []types.SeasonAnime, season string, year 
 func getStatusEmoji(status string) string {
 	switch status {
 	case "RELEASING":
-		return "🟢"
+		return ""
 	case "FINISHED":
-		return "✅"
+		return ""
 	case "NOT_YET_RELEASED":
-		return "🔜"
+		return ""
 	case "CANCELLED":
-		return "❌"
+		return ""
 	case "HIATUS":
-		return "⏸️"
+		return ""
 	default:
-		return "❓"
+		return ""
 	}
 }

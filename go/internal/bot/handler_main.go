@@ -32,7 +32,7 @@ func (b *Bot) interactionCreate(s *discordgo.Session, i *discordgo.InteractionCr
 	switch subcommand.Name {
 	case "find":
 		if !b.config.IsOpenAIEnabled {
-			b.respondWithError(s, i, "❌ The find command is disabled because OpenAI API key is not configured.")
+			b.respondWithError(s, i, "The find command is disabled because OpenAI API key is not configured.")
 			return
 		}
 		b.handleFindCommand(s, i, subcommand.Options)

@@ -6,7 +6,7 @@ import { formatCountdown, formatAirDate } from '@/utils/formatters'
 export async function handleNextCommand(interaction: ChatInputCommandInteraction) {
   const animeId = interaction.options.getInteger('id')
   if (!animeId) {
-    await interaction.reply('❌ Please provide a valid anime ID.')
+    await interaction.reply('Please provide a valid anime ID.')
     return
   }
 
@@ -16,7 +16,7 @@ export async function handleNextCommand(interaction: ChatInputCommandInteraction
     const anime = await getAnimeById(animeId)
 
     if (!anime) {
-      await interaction.editReply(`❌ No anime found with ID ${animeId}.`)
+      await interaction.editReply(`No anime found with ID ${animeId}.`)
       return
     }
 
@@ -38,6 +38,6 @@ export async function handleNextCommand(interaction: ChatInputCommandInteraction
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {
     console.error('Error in next command:', error)
-    await interaction.editReply('❌ An error occurred while fetching anime data.')
+    await interaction.editReply('An error occurred while fetching anime data.')
   }
 }

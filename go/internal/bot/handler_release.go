@@ -37,12 +37,12 @@ func (b *Bot) handleReleaseCommand(s *discordgo.Session, i *discordgo.Interactio
 	releasingAnime, err := anilist.GetReleasingAnime(page, perPage)
 	if err != nil {
 		log.Printf("Error getting releasing anime: %v", err)
-		b.respondWithError(s, i, "❌ An error occurred while fetching releasing anime.")
+		b.respondWithError(s, i, "An error occurred while fetching releasing anime.")
 		return
 	}
 
 	if len(releasingAnime.Data.Page.Media) == 0 {
-		b.respondWithError(s, i, "❌ No releasing anime found.")
+		b.respondWithError(s, i, "No releasing anime found.")
 		return
 	}
 

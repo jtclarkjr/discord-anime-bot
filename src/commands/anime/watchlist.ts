@@ -15,7 +15,7 @@ export async function handleWatchlistCommand(interaction: ChatInputCommandIntera
   // Validate that ID is provided for actions that require it
   if ((action === 'add' || action === 'remove') && !animeId) {
     await interaction.reply({
-      content: '❌ Please provide an anime ID for this action.',
+      content: 'Please provide an anime ID for this action.',
       flags: 1 << 6
     })
     return
@@ -29,7 +29,7 @@ export async function handleWatchlistCommand(interaction: ChatInputCommandIntera
       await handleWatchlistRemoveCommand(interaction, animeId!)
       break
     default:
-      await interaction.reply({ content: '❌ Unknown watchlist action.', flags: 1 << 6 })
+      await interaction.reply({ content: 'Unknown watchlist action.', flags: 1 << 6 })
   }
 }
 
@@ -44,13 +44,13 @@ async function handleWatchlistAddCommand(
       // Fetch anime name for confirmation
       const anime = await (await import('@/services/anime/next')).getAnimeById(animeId)
       const title = anime ? anime.title.english || anime.title.romaji : `Anime ID ${animeId}`
-      await interaction.editReply(`✅ Added **${title}** (ID: ${animeId}) to your watchlist.`)
+      await interaction.editReply(`Added **${title}** (ID: ${animeId}) to your watchlist.`)
     } else {
-      await interaction.editReply(`❌ ${result.message}`)
+      await interaction.editReply(`${result.message}`)
     }
   } catch (error) {
     console.error('Error adding to watchlist:', error)
-    await interaction.editReply('❌ An error occurred while adding to your watchlist.')
+    await interaction.editReply('An error occurred while adding to your watchlist.')
   }
 }
 
@@ -59,14 +59,14 @@ async function handleWatchlistListCommand(interaction: ChatInputCommandInteracti
   try {
     const watchlist = await getUserWatchlist(interaction.user.id)
     if (!watchlist || watchlist.length === 0) {
-      await interaction.editReply('📋 Your watchlist is empty.')
+      await interaction.editReply('Your watchlist is empty.')
       return
     }
     const embed = await createWatchlistEmbed(watchlist)
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {
     console.error('Error fetching watchlist:', error)
-    await interaction.editReply('❌ An error occurred while fetching your watchlist.')
+    await interaction.editReply('An error occurred while fetching your watchlist.')
   }
 }
 
@@ -81,12 +81,12 @@ async function handleWatchlistRemoveCommand(
       // Fetch anime name for confirmation
       const anime = await (await import('@/services/anime/next')).getAnimeById(animeId)
       const title = anime ? anime.title.english || anime.title.romaji : `Anime ID ${animeId}`
-      await interaction.editReply(`✅ Removed **${title}** (ID: ${animeId}) from your watchlist.`)
+      await interaction.editReply(`Removed **${title}** (ID: ${animeId}) from your watchlist.`)
     } else {
-      await interaction.editReply(`❌ ${result.message}`)
+      await interaction.editReply(`${result.message}`)
     }
   } catch (error) {
     console.error('Error removing from watchlist:', error)
-    await interaction.editReply('❌ An error occurred while removing from your watchlist.')
+    await interaction.editReply('An error occurred while removing from your watchlist.')
   }
 }

@@ -6,14 +6,14 @@ import { IS_AI_ENABLED } from '@/config/constants'
 export async function handleFindCommand(interaction: ChatInputCommandInteraction) {
   if (!IS_AI_ENABLED) {
     await interaction.reply(
-      '❌ The find command is disabled because no AI API key is configured. Please set the OPENAI_API_KEY or CLAUDE_API_KEY environment variable to use AI-powered anime search.'
+      'The find command is disabled because no AI API key is configured. Please set the OPENAI_API_KEY or CLAUDE_API_KEY environment variable to use AI-powered anime search.'
     )
     return
   }
 
   const prompt = interaction.options.getString('prompt')
   if (!prompt) {
-    await interaction.reply('❌ Please provide a description to search for anime.')
+    await interaction.reply('Please provide a description to search for anime.')
     return
   }
 
@@ -23,7 +23,7 @@ export async function handleFindCommand(interaction: ChatInputCommandInteraction
     const matches = await findAnimeWithDetails(prompt)
 
     if (matches.length === 0) {
-      await interaction.editReply(`❌ No anime found matching the description: "${prompt}"`)
+      await interaction.editReply(`No anime found matching the description: "${prompt}"`)
       return
     }
 
@@ -32,7 +32,7 @@ export async function handleFindCommand(interaction: ChatInputCommandInteraction
     const anime = bestMatch.anime
     const embed = createFindAnimeEmbed(anime, bestMatch)
 
-    let responseText = `🤖 **AI Found Anime Based on:** "${prompt}"\n\n`
+    let responseText = `**AI Found Anime Based on:** "${prompt}"\n\n`
 
     if (matches.length > 1) {
       responseText += `**Other possible matches:**\n`
@@ -49,7 +49,7 @@ export async function handleFindCommand(interaction: ChatInputCommandInteraction
   } catch (error) {
     console.error('Error in find command:', error)
     await interaction.editReply(
-      '❌ An error occurred while finding anime. Please try again with a different description.'
+      'An error occurred while finding anime. Please try again with a different description.'
     )
   }
 }

@@ -64,7 +64,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	nextEpisode, err := anilist.GetNextEpisode(animeID)
 	if err != nil {
 		log.Printf("Error getting next episode for anime %d: %v", animeID, err)
-		message := "❌ Failed to get anime information"
+		message := "Failed to get anime information"
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -75,7 +75,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	}
 
 	if nextEpisode == nil {
-		message := "❌ No upcoming episodes found for this anime"
+		message := "No upcoming episodes found for this anime"
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -89,7 +89,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	err = b.notificationService.AddNotification(animeID, channelID, userID, time.Unix(int64(nextEpisode.AiringAt), 0), nextEpisode.Episode)
 	if err != nil {
 		log.Printf("Error adding notification: %v", err)
-		message := "❌ Failed to add notification"
+		message := "Failed to add notification"
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -103,7 +103,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	anime, err := anilist.GetAnimeByID(animeID)
 	if err != nil {
 		log.Printf("Error getting anime details: %v", err)
-		message := "❌ Failed to get anime information"
+		message := "Failed to get anime information"
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -123,7 +123,7 @@ func (b *Bot) handleNotifyAddCommand(s *discordgo.Session, i *discordgo.Interact
 	relativeTime := utils.FormatRelativeTimestamp(airingTime)
 
 	embed := &discordgo.MessageEmbed{
-		Title:       "🔔 Notification Added",
+		Title:       "Notification Added",
 		Description: fmt.Sprintf("You'll be notified when **Episode %d** of **%s** airs %s", nextEpisode.Episode, title, relativeTime),
 		Color:       0x00FF00,
 		Timestamp:   airingTime.Format(time.RFC3339),
@@ -144,7 +144,7 @@ func (b *Bot) handleNotifyListCommand(s *discordgo.Session, i *discordgo.Interac
 
 	if len(notifications) == 0 {
 		embed := &discordgo.MessageEmbed{
-			Title:       "📋 Your Notifications",
+			Title:       "Your Notifications",
 			Description: "You have no active episode notifications.",
 			Color:       0x808080,
 		}
@@ -178,7 +178,7 @@ func (b *Bot) handleNotifyListCommand(s *discordgo.Session, i *discordgo.Interac
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:       "📋 Your Notifications",
+		Title:       "Your Notifications",
 		Description: description.String(),
 		Color:       0x0099FF,
 	}
@@ -199,7 +199,7 @@ func (b *Bot) handleNotifyCancelCommand(s *discordgo.Session, i *discordgo.Inter
 	err := b.notificationService.RemoveNotification(animeID, channelID, userID)
 	if err != nil {
 		log.Printf("Error removing notification: %v", err)
-		message := "❌ Failed to cancel notification"
+		message := "Failed to cancel notification"
 		_, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Content: &message,
 		})
@@ -210,7 +210,7 @@ func (b *Bot) handleNotifyCancelCommand(s *discordgo.Session, i *discordgo.Inter
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:       "🔕 Notification Cancelled",
+		Title:       "Notification Cancelled",
 		Description: fmt.Sprintf("Notification for anime ID %d has been cancelled.", animeID),
 		Color:       0xFF6600,
 	}

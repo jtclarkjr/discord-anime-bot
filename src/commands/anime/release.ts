@@ -13,7 +13,7 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
     const releasingAnime = await getReleasingAnime(page, perPage)
 
     if (releasingAnime.media.length === 0) {
-      await interaction.editReply('❌ No releasing anime found.')
+      await interaction.editReply('No releasing anime found.')
       return
     }
 
@@ -44,6 +44,6 @@ export async function handleReleaseCommand(interaction: ChatInputCommandInteract
     await interaction.editReply({ embeds: [embed] })
   } catch (error) {
     console.error('Error in release command:', error)
-    await interaction.editReply('❌ An error occurred while fetching releasing anime.')
+    await interaction.editReply('An error occurred while fetching releasing anime.')
   }
 }

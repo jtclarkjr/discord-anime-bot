@@ -5,7 +5,7 @@ import { searchAnime } from '@/services/anime/search'
 export async function handleSearchCommand(interaction: ChatInputCommandInteraction) {
   const searchQuery = interaction.options.getString('query')
   if (!searchQuery) {
-    await interaction.reply('❌ Please provide an anime name to search for.')
+    await interaction.reply('Please provide an anime name to search for.')
     return
   }
 
@@ -15,7 +15,7 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
     const searchResults = await searchAnime(searchQuery)
 
     if (searchResults.media.length === 0) {
-      await interaction.editReply(`❌ No anime found for "${searchQuery}".`)
+      await interaction.editReply(`No anime found for "${searchQuery}".`)
       return
     }
 
@@ -34,6 +34,6 @@ export async function handleSearchCommand(interaction: ChatInputCommandInteracti
     await interaction.editReply({ content: responseText, embeds: [embed] })
   } catch (error) {
     console.error('Error in search command:', error)
-    await interaction.editReply('❌ An error occurred while searching for anime.')
+    await interaction.editReply('An error occurred while searching for anime.')
   }
 }

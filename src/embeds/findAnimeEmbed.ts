@@ -3,7 +3,7 @@ import type { AnimeMedia, AnimeMatch } from '@/types/anilist'
 
 export function createFindAnimeEmbed(anime: AnimeMedia, bestMatch: AnimeMatch): EmbedBuilder {
   return new EmbedBuilder()
-    .setTitle(`🎯 ${anime.title.english || anime.title.romaji}`)
+    .setTitle(`${anime.title.english || anime.title.romaji}`)
     .setURL(anime.siteUrl)
     .setThumbnail(anime.coverImage.large)
     .setDescription(bestMatch.reason)

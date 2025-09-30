@@ -14,7 +14,7 @@ import (
 // handleFindCommand handles the anime find subcommand
 func (b *Bot) handleFindCommand(s *discordgo.Session, i *discordgo.InteractionCreate, options []*discordgo.ApplicationCommandInteractionDataOption) {
 	if !b.config.IsOpenAIEnabled {
-		b.respondWithError(s, i, "❌ The find command is disabled because OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable to use AI-powered anime search.")
+		b.respondWithError(s, i, "The find command is disabled because OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable to use AI-powered anime search.")
 		return
 	}
 
@@ -33,12 +33,12 @@ func (b *Bot) handleFindCommand(s *discordgo.Session, i *discordgo.InteractionCr
 	matches, err := anilist.FindAnimeWithDetails(prompt, b.config)
 	if err != nil {
 		log.Printf("Error finding anime: %v", err)
-		b.respondWithError(s, i, "❌ An error occurred while searching for anime.")
+		b.respondWithError(s, i, "An error occurred while searching for anime.")
 		return
 	}
 
 	if len(matches) == 0 {
-		b.respondWithError(s, i, fmt.Sprintf("❌ No anime found matching the description: \"%s\"", prompt))
+		b.respondWithError(s, i, fmt.Sprintf("No anime found matching the description: \"%s\"", prompt))
 		return
 	}
 

@@ -63,9 +63,9 @@ func (b *Bot) handleWatchlistAddCommand(s *discordgo.Session, i *discordgo.Inter
 		} else {
 			title = fmt.Sprintf("Anime ID %d", animeID)
 		}
-		msg = fmt.Sprintf("✅ Added **%s** (ID: %d) to your watchlist.", title, animeID)
+		msg = fmt.Sprintf("Added **%s** (ID: %d) to your watchlist.", title, animeID)
 	} else if err != nil {
-		msg = "❌ Failed to add to watchlist"
+		msg = "Failed to add to watchlist"
 	}
 	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 }
@@ -74,12 +74,12 @@ func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.Inte
 	userID := i.Member.User.ID
 	ids, err := anilist.GetUserWatchlist(userID)
 	if err != nil {
-		msg := "❌ Failed to fetch your watchlist"
+		msg := "Failed to fetch your watchlist"
 		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 		return
 	}
 	if len(ids) == 0 {
-		msg := "📋 Your watchlist is empty."
+		msg := "Your watchlist is empty."
 		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 		return
 	}
@@ -108,9 +108,9 @@ func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.In
 		} else {
 			title = fmt.Sprintf("Anime ID %d", animeID)
 		}
-		msg = fmt.Sprintf("✅ Removed **%s** (ID: %d) from your watchlist.", title, animeID)
+		msg = fmt.Sprintf("Removed **%s** (ID: %d) from your watchlist.", title, animeID)
 	} else if err != nil {
-		msg = "❌ Failed to remove from watchlist"
+		msg = "Failed to remove from watchlist"
 	}
 	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
 }

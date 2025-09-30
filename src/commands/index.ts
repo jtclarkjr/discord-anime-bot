@@ -35,7 +35,7 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
     case 'find':
       if (!IS_OPENAI_ENABLED) {
         await interaction.reply(
-          '❌ The find command is disabled because OpenAI API key is not configured.'
+          'The find command is disabled because OpenAI API key is not configured.'
         )
         return
       }
@@ -45,6 +45,6 @@ export async function handleAnimeCommand(interaction: ChatInputCommandInteractio
       await handleHelpCommand(interaction)
       break
     default:
-      await interaction.reply('❌ Unknown subcommand.')
+      await interaction.reply('Unknown subcommand.')
   }
 }

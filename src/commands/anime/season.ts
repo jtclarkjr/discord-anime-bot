@@ -13,14 +13,14 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
     // Validate season
     const validSeasons = ['winter', 'spring', 'summer', 'fall']
     if (!validSeasons.includes(season.toLowerCase())) {
-      await interaction.editReply('❌ Invalid season. Please use: winter, spring, summer, or fall.')
+      await interaction.editReply('Invalid season. Please use: winter, spring, summer, or fall.')
       return
     }
 
     const seasonAnime = await getSeasonAnime(season, year)
 
     if (seasonAnime.media.length === 0) {
-      await interaction.editReply(`❌ No anime found for ${season} ${year}.`)
+      await interaction.editReply(`No anime found for ${season} ${year}.`)
       return
     }
 
@@ -46,23 +46,23 @@ export async function handleSeasonCommand(interaction: ChatInputCommandInteracti
     }
   } catch (error) {
     console.error('Error in season command:', error)
-    await interaction.editReply('❌ An error occurred while fetching seasonal anime.')
+    await interaction.editReply('An error occurred while fetching seasonal anime.')
   }
 }
 
 function getStatusEmoji(status: AnimeStatus): string {
   switch (status) {
     case 'RELEASING':
-      return '🟢'
+      return ''
     case 'FINISHED':
-      return '✅'
+      return ''
     case 'NOT_YET_RELEASED':
-      return '🔜'
+      return ''
     case 'CANCELLED':
-      return '❌'
+      return ''
     case 'HIATUS':
-      return '⏸️'
+      return ''
     default:
-      return '❓'
+      return ''
   }
 }

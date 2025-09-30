@@ -28,7 +28,7 @@ func (b *Bot) handleNextCommand(s *discordgo.Session, i *discordgo.InteractionCr
 	anime, err := anilist.GetAnimeByID(animeID)
 	if err != nil {
 		log.Printf("Error getting anime by ID %d: %v", animeID, err)
-		b.respondWithError(s, i, fmt.Sprintf("❌ No anime found with ID %d.", animeID))
+		b.respondWithError(s, i, fmt.Sprintf("No anime found with ID %d.", animeID))
 		return
 	}
 

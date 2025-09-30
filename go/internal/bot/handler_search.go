@@ -26,12 +26,12 @@ func (b *Bot) handleSearchCommand(s *discordgo.Session, i *discordgo.Interaction
 	searchResults, err := anilist.SearchAnime(query, 1, 5)
 	if err != nil {
 		log.Printf("Error searching anime: %v", err)
-		b.respondWithError(s, i, "❌ An error occurred while searching for anime.")
+		b.respondWithError(s, i, "An error occurred while searching for anime.")
 		return
 	}
 
 	if len(searchResults.Data.Page.Media) == 0 {
-		b.respondWithError(s, i, fmt.Sprintf("❌ No anime found for query: \"%s\"", query))
+		b.respondWithError(s, i, fmt.Sprintf("No anime found for query: \"%s\"", query))
 		return
 	}
 

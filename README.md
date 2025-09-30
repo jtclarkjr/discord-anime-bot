@@ -113,12 +113,12 @@ src/
 - Supports all four seasons: Winter, Spring, Summer, Fall
 - Year parameter is optional (defaults to current year)
 - Shows **complete** seasonal listings (not truncated like other commands)
-- Displays status indicators with emojis:
-  - 🟢 Currently Releasing
-  - ✅ Finished
-  - 🔜 Not Yet Released
-  - ❌ Cancelled
-  - ⏸️ On Hiatus
+- Displays status indicators:
+  - Currently Releasing
+  - Finished
+  - Not Yet Released
+  - Cancelled
+  - On Hiatus
 - Automatically handles multiple embeds for large seasonal catalogs
 - Sorted by popularity from AniList
 - Examples:
