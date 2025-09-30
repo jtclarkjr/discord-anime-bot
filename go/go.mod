@@ -3,7 +3,7 @@ module discord-anime-bot
 go 1.24.1
 
 require (
-	github.com/anthropics/anthropic-sdk-go v1.11.0
+	github.com/anthropics/anthropic-sdk-go v1.13.0
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/joho/godotenv v1.5.1
 	github.com/openai/openai-go/v2 v2.4.0

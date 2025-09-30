@@ -26,7 +26,7 @@ func (c *ClaudeClient) FindAnimeByDescription(prompt string) (string, error) {
 		return "", nil
 	}
 	params := anthropic.MessageNewParams{
-		Model:     anthropic.ModelClaudeSonnet4_0,
+		Model:     anthropic.ModelClaudeSonnet4_5,
 		MaxTokens: 2048,
 		Messages: []anthropic.MessageParam{
 			anthropic.NewUserMessage(anthropic.NewTextBlock(
