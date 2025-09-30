@@ -2,6 +2,7 @@ package bot
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"discord-anime-bot/internal/services/anilist"
@@ -33,7 +34,9 @@ func (b *Bot) handleWatchlistCommand(s *discordgo.Session, i *discordgo.Interact
 	// Validate that ID is provided for actions that require it
 	if (action == "add" || action == "remove") && animeID == 0 {
 		msg := "Please provide an anime ID for this action."
-		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+		if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 
@@ -67,7 +70,9 @@ func (b *Bot) handleWatchlistAddCommand(s *discordgo.Session, i *discordgo.Inter
 	} else if err != nil {
 		msg = "Failed to add to watchlist"
 	}
-	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+	if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+		log.Printf("Failed to edit interaction response: %v", err)
+	}
 }
 
 func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -75,12 +80,16 @@ func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.Inte
 	ids, err := anilist.GetUserWatchlist(userID)
 	if err != nil {
 		msg := "Failed to fetch your watchlist"
-		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+		if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 	if len(ids) == 0 {
 		msg := "Your watchlist is empty."
-		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+		if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+			log.Printf("Failed to edit interaction response: %v", err)
+		}
 		return
 	}
 	var sb strings.Builder
@@ -89,7 +98,9 @@ func (b *Bot) handleWatchlistListCommand(s *discordgo.Session, i *discordgo.Inte
 		sb.WriteString(fmt.Sprintf("• AniList ID: %d\n", id))
 	}
 	msg := sb.String()
-	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+	if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+		log.Printf("Failed to edit interaction response: %v", err)
+	}
 }
 
 func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.InteractionCreate, animeID int) {
@@ -112,5 +123,7 @@ func (b *Bot) handleWatchlistRemoveCommand(s *discordgo.Session, i *discordgo.In
 	} else if err != nil {
 		msg = "Failed to remove from watchlist"
 	}
-	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg})
+	if _, err := s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{Content: &msg}); err != nil {
+		log.Printf("Failed to edit interaction response: %v", err)
+	}
 }

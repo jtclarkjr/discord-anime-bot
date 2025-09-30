@@ -118,7 +118,9 @@ func (b *Bot) createSeasonEmbeds(media []types.SeasonAnime, season string, year 
 			description.WriteString(fmt.Sprintf("%d. **%s** %s (ID: %d)\n", startIndex+j+1, title, statusEmoji, anime.ID))
 		}
 
-		embedTitle := fmt.Sprintf("%s %d Anime", strings.Title(season), year)
+	// Capitalize first letter of season
+	capitalizedSeason := strings.ToUpper(season[:1]) + strings.ToLower(season[1:])
+	embedTitle := fmt.Sprintf("%s %d Anime", capitalizedSeason, year)
 		if totalEmbeds > 1 {
 			embedTitle += fmt.Sprintf(" (Part %d/%d)", i+1, totalEmbeds)
 		}

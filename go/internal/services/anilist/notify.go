@@ -81,7 +81,9 @@ func (ns *NotificationService) loadNotifications() {
 		airingTime := time.Unix(persistedNotification.AiringAt/1000, 0)
 		if airingTime.Before(now) {
 			// Remove expired notification
-			redis.Delete(ctx, redisKey)
+			if err := redis.Delete(ctx, redisKey); err != nil {
+				log.Printf("Error deleting expired notification %s from Redis: %v", redisKey, err)
+			}
 			continue
 		}
 
@@ -148,13 +150,6 @@ func createNotificationKey(animeID int, channelID, userID string) string {
 	return fmt.Sprintf("%d-%s-%s", animeID, channelID, userID)
 }
 
-// scheduleNotification sets up a timer for the notification (with locking)
-func (ns *NotificationService) scheduleNotification(entry *types.NotificationEntry) {
-	ns.mu.Lock()
-	defer ns.mu.Unlock()
-	ns.scheduleNotificationInternal(entry)
-}
-
 // scheduleNotificationInternal sets up a timer for the notification (without locking)
 func (ns *NotificationService) scheduleNotificationInternal(entry *types.NotificationEntry) {
 	notificationKey := createNotificationKey(entry.AnimeID, entry.ChannelID, entry.UserID)
@@ -180,7 +175,9 @@ func (ns *NotificationService) scheduleNotificationInternal(entry *types.Notific
 			delete(ns.notifications, notificationKey)
 			ns.mu.Unlock()
 			// Remove from Redis as well
-			ns.removeNotificationFromRedis(notificationKey)
+			if err := ns.removeNotificationFromRedis(notificationKey); err != nil {
+				log.Printf("Error removing notification from Redis: %v", err)
+			}
 		}
 	})
 

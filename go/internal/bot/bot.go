@@ -64,7 +64,9 @@ func (b *Bot) Stop() {
 		b.notificationService.Cleanup()
 	}
 	if b.session != nil {
-		b.session.Close()
+		if err := b.session.Close(); err != nil {
+			log.Printf("Error closing Discord session: %v", err)
+		}
 	}
 	// Close Redis connection
 	if err := redis.Close(); err != nil {
