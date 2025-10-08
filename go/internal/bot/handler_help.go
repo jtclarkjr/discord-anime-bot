@@ -6,15 +6,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// GetHelpCommandOption returns the help subcommand option for /anime
-func GetHelpCommandOption() *discordgo.ApplicationCommandOption {
-	return &discordgo.ApplicationCommandOption{
-		Type:        discordgo.ApplicationCommandOptionSubCommand,
-		Name:        "help",
-		Description: "Show help for all /anime commands",
-	}
-}
-
 // handleHelpCommand responds with a list of all /anime commands and their arguments
 func (b *Bot) handleHelpCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	helpLines := []string{

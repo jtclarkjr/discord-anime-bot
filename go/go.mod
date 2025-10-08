@@ -1,6 +1,6 @@
 module discord-anime-bot
 
-go 1.24.1
+go 1.25.1
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.13.0
