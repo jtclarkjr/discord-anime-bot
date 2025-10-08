@@ -68,36 +68,47 @@ func (ns *NotificationService) loadNotifications() {
 
 	now := time.Now()
 	loadedCount := 0
+	var mu sync.Mutex // Protect the loadedCount variable
+	var wg sync.WaitGroup
 
+	// Process notifications concurrently using wg.Go()
 	for _, redisKey := range notificationKeys {
-		var persistedNotification types.PersistedNotification
-		err := redis.Get(ctx, redisKey, &persistedNotification)
-		if err != nil {
-			log.Printf("Error getting notification %s from Redis: %v", redisKey, err)
-			continue
-		}
-
-		// Skip expired notifications
-		airingTime := time.Unix(persistedNotification.AiringAt/1000, 0)
-		if airingTime.Before(now) {
-			// Remove expired notification
-			if err := redis.Delete(ctx, redisKey); err != nil {
-				log.Printf("Error deleting expired notification %s from Redis: %v", redisKey, err)
+		wg.Go(func() {
+			var persistedNotification types.PersistedNotification
+			err := redis.Get(ctx, redisKey, &persistedNotification)
+			if err != nil {
+				log.Printf("Error getting notification %s from Redis: %v", redisKey, err)
+				return
 			}
-			continue
-		}
 
-		notification := types.NotificationEntry{
-			AnimeID:   persistedNotification.AnimeID,
-			ChannelID: persistedNotification.ChannelID,
-			UserID:    persistedNotification.UserID,
-			AiringAt:  persistedNotification.AiringAt / 1000, // Convert to seconds
-			Episode:   persistedNotification.Episode,
-		}
+			// Skip expired notifications
+			airingTime := time.Unix(persistedNotification.AiringAt/1000, 0)
+			if airingTime.Before(now) {
+				// Remove expired notification
+				if err := redis.Delete(ctx, redisKey); err != nil {
+					log.Printf("Error deleting expired notification %s from Redis: %v", redisKey, err)
+				}
+				return
+			}
 
-		ns.scheduleNotificationInternal(&notification)
-		loadedCount++
+			notification := types.NotificationEntry{
+				AnimeID:   persistedNotification.AnimeID,
+				ChannelID: persistedNotification.ChannelID,
+				UserID:    persistedNotification.UserID,
+				AiringAt:  persistedNotification.AiringAt / 1000, // Convert to seconds
+				Episode:   persistedNotification.Episode,
+			}
+
+			ns.scheduleNotificationInternal(&notification)
+
+			mu.Lock()
+			loadedCount++
+			mu.Unlock()
+		})
 	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
 
 	log.Printf("Loaded %d active notifications from Redis", loadedCount)
 }
@@ -300,14 +311,26 @@ func (ns *NotificationService) GetUserNotifications(userID string) []*types.Noti
 // Cleanup stops all timers
 func (ns *NotificationService) Cleanup() {
 	ns.mu.Lock()
-	defer ns.mu.Unlock()
+	timers := make([]*notificationTimer, 0, len(ns.notifications))
+	for _, timer := range ns.notifications {
+		timers = append(timers, timer)
+	}
+	ns.mu.Unlock()
 
 	log.Println("Cleaning up notification service...")
 
-	for _, timer := range ns.notifications {
-		timer.Timer.Stop()
-		timer.CancelFunc()
+	var wg sync.WaitGroup
+
+	// Clean up timers concurrently using the new wg.Go() pattern (Go 1.25+)
+	for _, timer := range timers {
+		wg.Go(func() {
+			timer.Timer.Stop()
+			timer.CancelFunc()
+		})
 	}
+
+	// Wait for all cleanup operations to complete
+	wg.Wait()
 
 	log.Println("Notification service cleanup complete")
 }
